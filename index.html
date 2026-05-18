@@ -30,19 +30,62 @@
         .header {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            padding: 25px 30px;
+            padding: 20px 30px;
             text-align: center;
+            position: relative;
         }
         
         .header h1 {
             font-size: 2.2em;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
         
         .header .subtitle {
             font-size: 1.1em;
             opacity: 0.9;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .save-bar {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .save-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .last-save {
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        
+        .unsaved-indicator {
+            display: none;
+            color: #EF5350;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
         
         .nav-tabs {
@@ -220,7 +263,7 @@
             cursor: pointer;
             font-weight: 600;
             transition: all 0.3s ease;
-            margin: 5px;
+            margin: 2px;
             font-size: 0.9em;
         }
         
@@ -244,11 +287,37 @@
             color: white;
         }
         
+        .btn-save {
+            background: #28a745;
+            color: white;
+            font-size: 1em;
+            padding: 10px 25px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+        
+        .btn-save:hover {
+            animation: none;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
         .btn-edit {
             background: #17a2b8;
             color: white;
             padding: 3px 8px;
             font-size: 0.8em;
+        }
+        
+        .btn-history {
+            background: #6c757d;
+            color: white;
+            padding: 8px 15px;
         }
         
         .btn:hover {
@@ -265,17 +334,20 @@
             height: 100%;
             background: rgba(0,0,0,0.5);
             z-index: 1000;
+            overflow-y: auto;
         }
         
         .modal-content {
             background: white;
-            margin: 5% auto;
+            margin: 3% auto;
             padding: 30px;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             border-radius: 15px;
             position: relative;
             animation: slideIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         @keyframes slideIn {
@@ -370,21 +442,43 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
-        .save-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background: #4CAF50;
-            border-radius: 50%;
-            margin-left: 5px;
-            animation: pulse 1.5s infinite;
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
         }
         
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
+        .history-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #2a5298;
+            font-size: 0.9em;
         }
+        
+        .history-time {
+            color: #6c757d;
+            font-size: 0.8em;
+        }
+        
+        .history-user {
+            color: #2a5298;
+            font-weight: bold;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .badge-success { background: #4CAF50; color: white; }
+        .badge-warning { background: #FFA726; color: white; }
+        .badge-danger { background: #EF5350; color: white; }
     </style>
 </head>
 <body>
@@ -392,7 +486,25 @@
         <div class="header">
             <h1>⚡ Subestación de Potencia</h1>
             <div class="subtitle">50 MVA - 230 kV / 13.8 kV | Sistema de Control y Seguimiento</div>
-            <small style="opacity: 0.8;">✏️ Haz clic en cualquier porcentaje o badge para editar</small>
+            <div class="user-info" id="current-user-display">
+                👤 <span id="display-username">No identificado</span>
+            </div>
+        </div>
+        
+        <div class="save-bar">
+            <div class="save-info">
+                <button class="btn btn-save" onclick="saveChanges()" title="Guardar todos los cambios">
+                    💾 GUARDAR CAMBIOS
+                </button>
+                <span class="unsaved-indicator" id="unsaved-indicator">
+                    ⚠️ Cambios sin guardar
+                </span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span class="last-save" id="last-save-info">Último guardado: Nunca</span>
+                <button class="btn btn-history" onclick="showHistory()">📋 Historial</button>
+                <button class="btn btn-primary" onclick="changeUser()">👤 Cambiar Usuario</button>
+            </div>
         </div>
         
         <div class="nav-tabs">
@@ -408,11 +520,11 @@
                 <h2>Dashboard General del Proyecto</h2>
                 <div class="dashboard-grid">
                     <div class="card">
-                        <h3>📈 Avance General <span class="save-indicator" title="Auto-guardado"></span></h3>
+                        <h3>📈 Avance General</h3>
                         <div class="progress-bar" onclick="editProgress('general', this)">
                             <div class="progress-fill" style="width: 35%" data-value="35">35%</div>
                         </div>
-                        <div class="stat-number" contenteditable="true" onblur="updateStat(this, 'general')">35%</div>
+                        <div class="stat-number" contenteditable="true" onblur="markAsChanged()">35%</div>
                         <div class="stat-label">Progreso total del proyecto</div>
                     </div>
                     
@@ -421,7 +533,7 @@
                         <div class="progress-bar" onclick="editProgress('civil', this)">
                             <div class="progress-fill" style="width: 65%" data-value="65">65%</div>
                         </div>
-                        <div class="stat-number" contenteditable="true" onblur="updateStat(this, 'civil')">65%</div>
+                        <div class="stat-number" contenteditable="true" onblur="markAsChanged()">65%</div>
                         <div class="stat-label">Excavaciones, cimentaciones, estructuras</div>
                     </div>
                     
@@ -430,7 +542,7 @@
                         <div class="progress-bar" onclick="editProgress('electromecanica', this)">
                             <div class="progress-fill" style="width: 15%" data-value="15">15%</div>
                         </div>
-                        <div class="stat-number" contenteditable="true" onblur="updateStat(this, 'electromecanica')">15%</div>
+                        <div class="stat-number" contenteditable="true" onblur="markAsChanged()">15%</div>
                         <div class="stat-label">Equipos, montaje, conexiones</div>
                     </div>
                     
@@ -439,7 +551,7 @@
                         <div class="progress-bar" onclick="editProgress('puesta-marcha', this)">
                             <div class="progress-fill" style="width: 0%" data-value="0">0%</div>
                         </div>
-                        <div class="stat-number" contenteditable="true" onblur="updateStat(this, 'puesta-marcha')">0%</div>
+                        <div class="stat-number" contenteditable="true" onblur="markAsChanged()">0%</div>
                         <div class="stat-label">Pruebas y energización</div>
                     </div>
                 </div>
@@ -449,22 +561,22 @@
                     <ul class="task-list">
                         <li class="task-item completed" data-id="1">
                             <span>✅ Excavación de zanjas para cables de potencia</span>
-                            <span class="status-badge status-completed" onclick="cycleStatus(this)">Completado</span>
+                            <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">Completado</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </li>
                         <li class="task-item completed" data-id="2">
                             <span>✅ Cimentación de transformador principal</span>
-                            <span class="status-badge status-completed" onclick="cycleStatus(this)">Completado</span>
+                            <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">Completado</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </li>
                         <li class="task-item in-progress" data-id="3">
                             <span>🔄 Montaje de estructuras metálicas</span>
-                            <span class="status-badge status-in-progress" onclick="cycleStatus(this)">En Progreso</span>
+                            <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">En Progreso</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </li>
                         <li class="task-item pending" data-id="4">
                             <span>⏳ Instalación de transformador 50 MVA</span>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this)">Pendiente</span>
+                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </li>
                     </ul>
@@ -485,17 +597,17 @@
                         <ul class="task-list">
                             <li class="task-item completed" data-id="c1">
                                 <span>Excavación patio de maniobras</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this)">100%</span>
+                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item completed" data-id="c2">
                                 <span>Nivelación de terreno</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this)">100%</span>
+                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item in-progress" data-id="c3">
                                 <span>Compactación de suelo</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this)">75%</span>
+                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">75%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                         </ul>
@@ -509,17 +621,17 @@
                         <ul class="task-list">
                             <li class="task-item completed" data-id="c4">
                                 <span>Base transformador principal</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this)">100%</span>
+                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item in-progress" data-id="c5">
                                 <span>Cimentación interruptores 230 kV</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this)">60%</span>
+                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">60%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="c6">
                                 <span>Bases para seccionadores</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                         </ul>
@@ -533,17 +645,17 @@
                         <ul class="task-list">
                             <li class="task-item completed" data-id="c7">
                                 <span>Caseta de control</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this)">100%</span>
+                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item in-progress" data-id="c8">
                                 <span>Estructuras soporte barras 230 kV</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this)">30%</span>
+                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">30%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="c9">
                                 <span>Cerco perimetral</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                         </ul>
@@ -557,17 +669,17 @@
                         <ul class="task-list">
                             <li class="task-item in-progress" data-id="c10">
                                 <span>Canaletas de cables</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this)">40%</span>
+                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">40%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="c11">
                                 <span>Drenaje de aguas pluviales</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">10%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">10%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="c12">
                                 <span>Fosa de aceite</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                         </ul>
@@ -589,17 +701,17 @@
                         <ul class="task-list">
                             <li class="task-item in-progress" data-id="e1">
                                 <span>Preparación de base</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this)">30%</span>
+                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">30%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="e2">
                                 <span>Transporte y descarga</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="e3">
                                 <span>Montaje de accesorios</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                         </ul>
@@ -613,17 +725,17 @@
                         <ul class="task-list">
                             <li class="task-item pending" data-id="e4">
                                 <span>Interruptores SF6</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="e5">
                                 <span>Seccionadores tripolares</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="e6">
                                 <span>Transformadores de corriente</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                         </ul>
@@ -637,17 +749,17 @@
                         <ul class="task-list">
                             <li class="task-item completed" data-id="e7">
                                 <span>Tableros de control</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this)">100%</span>
+                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item in-progress" data-id="e8">
                                 <span>Banco de baterías 125 VCC</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this)">50%</span>
+                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">50%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                             <li class="task-item pending" data-id="e9">
                                 <span>Sistema contra incendios</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this)">0%</span>
+                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
                                 <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                             </li>
                         </ul>
@@ -666,31 +778,31 @@
                         <div class="timeline-item" data-id="p1">
                             <h4>Fase 1: Pruebas en Fábrica</h4>
                             <p>Transformador, interruptores, seccionadores - FAT</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this)">Pendiente</span>
+                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </div>
                         <div class="timeline-item" data-id="p2">
                             <h4>Fase 2: Pruebas de Recepción en Sitio</h4>
                             <p>Verificación de equipos, inspección visual, pruebas mecánicas</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this)">Pendiente</span>
+                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </div>
                         <div class="timeline-item" data-id="p3">
                             <h4>Fase 3: Pruebas de Aislamiento</h4>
                             <p>Rigidez dieléctrica, factor de potencia, resistencia de aislamiento</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this)">Pendiente</span>
+                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </div>
                         <div class="timeline-item" data-id="p4">
                             <h4>Fase 4: Pruebas Funcionales</h4>
                             <p>Sistemas de control, protecciones, comunicaciones</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this)">Pendiente</span>
+                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </div>
                         <div class="timeline-item" data-id="p5">
                             <h4>Fase 5: Energización Progresiva</h4>
                             <p>Pruebas en vacío, con carga, sincronización</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this)">Pendiente</span>
+                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
                             <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
                         </div>
                     </div>
@@ -720,7 +832,7 @@
         </div>
     </div>
     
-    <!-- Modal para editar tarea específica -->
+    <!-- Modal para editar tarea -->
     <div id="modal-task" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('modal-task')">&times;</span>
@@ -747,13 +859,90 @@
         </div>
     </div>
     
+    <!-- Modal para guardar con usuario -->
+    <div id="modal-save" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-save')">&times;</span>
+            <h2>💾 Confirmar Guardado</h2>
+            <div class="form-group">
+                <label>👤 Nombre de quien realiza la modificación *</label>
+                <input type="text" id="save-username" placeholder="Ingrese su nombre completo" required>
+            </div>
+            <div class="form-group">
+                <label>📝 Comentario (opcional)</label>
+                <textarea id="save-comment" rows="3" placeholder="Describa los cambios realizados..."></textarea>
+            </div>
+            <button onclick="confirmSave()" class="btn btn-save" style="width: 100%;">💾 Guardar Cambios</button>
+        </div>
+    </div>
+    
+    <!-- Modal para cambiar usuario -->
+    <div id="modal-user" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('modal-user')">&times;</span>
+            <h2>👤 Cambiar Usuario Actual</h2>
+            <div class="form-group">
+                <label>Nombre del usuario</label>
+                <input type="text" id="change-username" placeholder="Ingrese su nombre" required>
+            </div>
+            <button onclick="changeUserConfirm()" class="btn btn-primary" style="width: 100%;">✅ Establecer Usuario</button>
+        </div>
+    </div>
+    
+    <!-- Modal de historial -->
+    <div id="modal-history" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <span class="close" onclick="closeModal('modal-history')">&times;</span>
+            <h2>📋 Historial de Modificaciones</h2>
+            <div class="history-list" id="history-list">
+                <p style="color: #6c757d;">No hay modificaciones registradas</p>
+            </div>
+            <button onclick="clearHistory()" class="btn btn-danger" style="margin-top: 15px;">🗑️ Limpiar Historial</button>
+        </div>
+    </div>
+    
     <!-- Notificación -->
     <div id="notification" class="notification"></div>
     
     <script>
-        let currentProgressBar = null;
-        let currentSection = null;
-        let currentTaskElement = null;
+        // Variables globales
+        let currentUser = localStorage.getItem('currentUser') || '';
+        let hasUnsavedChanges = false;
+        let modificationHistory = JSON.parse(localStorage.getItem('modificationHistory') || '[]');
+        let lastSaveTime = localStorage.getItem('lastSaveTime') || null;
+        
+        // Inicialización
+        window.addEventListener('load', () => {
+            updateUserDisplay();
+            updateLastSaveDisplay();
+            loadFromLocalStorage();
+            
+            if (!currentUser) {
+                setTimeout(() => {
+                    changeUser();
+                }, 500);
+            }
+            
+            console.log('✅ Sistema listo - Usuario: ' + (currentUser || 'No definido'));
+            console.log('💾 Click en "GUARDAR CAMBIOS" para registrar modificaciones');
+        });
+        
+        function updateUserDisplay() {
+            document.getElementById('display-username').textContent = currentUser || 'No identificado';
+        }
+        
+        function updateLastSaveDisplay() {
+            if (lastSaveTime) {
+                document.getElementById('last-save-info').textContent = 'Último guardado: ' + new Date(lastSaveTime).toLocaleString();
+            } else {
+                document.getElementById('last-save-info').textContent = 'Último guardado: Nunca';
+            }
+        }
+        
+        function markAsChanged() {
+            hasUnsavedChanges = true;
+            document.getElementById('unsaved-indicator').style.display = 'inline';
+        }
         
         function showTab(tabName) {
             const contents = document.querySelectorAll('.tab-content');
@@ -777,7 +966,178 @@
             }, 3000);
         }
         
-        // Editar progreso de sección
+        // Función principal de guardado
+        function saveChanges() {
+            if (!currentUser) {
+                showNotification('⚠️ Debe identificarse primero. Use "Cambiar Usuario"', 'error');
+                changeUser();
+                return;
+            }
+            
+            document.getElementById('save-username').value = currentUser;
+            document.getElementById('save-comment').value = '';
+            document.getElementById('modal-save').style.display = 'block';
+        }
+        
+        function confirmSave() {
+            const username = document.getElementById('save-username').value.trim();
+            const comment = document.getElementById('save-comment').value.trim();
+            
+            if (!username) {
+                showNotification('⚠️ Debe ingresar su nombre', 'error');
+                return;
+            }
+            
+            // Actualizar usuario actual
+            currentUser = username;
+            localStorage.setItem('currentUser', currentUser);
+            updateUserDisplay();
+            
+            // Guardar datos
+            const saveData = {
+                timestamp: new Date().toISOString(),
+                user: username,
+                comment: comment,
+                data: getAllCurrentData()
+            };
+            
+            // Agregar al historial
+            modificationHistory.unshift(saveData);
+            if (modificationHistory.length > 50) modificationHistory.pop(); // Mantener solo últimos 50
+            localStorage.setItem('modificationHistory', JSON.stringify(modificationHistory));
+            
+            // Guardar en localStorage
+            saveToLocalStorage();
+            
+            // Actualizar estado
+            lastSaveTime = new Date().toISOString();
+            localStorage.setItem('lastSaveTime', lastSaveTime);
+            hasUnsavedChanges = false;
+            document.getElementById('unsaved-indicator').style.display = 'none';
+            updateLastSaveDisplay();
+            
+            closeModal('modal-save');
+            showNotification('✅ Cambios guardados por: ' + username);
+        }
+        
+        function getAllCurrentData() {
+            const data = {
+                progress: {},
+                tasks: []
+            };
+            
+            // Guardar progresos de secciones
+            document.querySelectorAll('.progress-fill[data-value]').forEach(bar => {
+                const card = bar.closest('.card');
+                const section = card?.dataset?.section || 'general';
+                data.progress[section] = {
+                    value: bar.dataset.value,
+                    text: bar.textContent
+                };
+            });
+            
+            // Guardar tareas
+            document.querySelectorAll('.task-item[data-id]').forEach(task => {
+                const badge = task.querySelector('.status-badge');
+                data.tasks.push({
+                    id: task.dataset.id,
+                    name: task.querySelector('span:first-child')?.textContent || '',
+                    percentage: badge?.textContent || '0%',
+                    status: task.className.includes('completed') ? 'completed' : 
+                            task.className.includes('in-progress') ? 'in-progress' : 'pending'
+                });
+            });
+            
+            return data;
+        }
+        
+        function saveToLocalStorage() {
+            try {
+                const data = getAllCurrentData();
+                localStorage.setItem('subestacion-data', JSON.stringify(data));
+            } catch (e) {
+                console.warn('No se pudo guardar en localStorage:', e);
+            }
+        }
+        
+        function loadFromLocalStorage() {
+            try {
+                const saved = localStorage.getItem('subestacion-data');
+                if (!saved) return;
+                
+                const data = JSON.parse(saved);
+                
+                // Restaurar progresos
+                if (data.progress) {
+                    Object.entries(data.progress).forEach(([section, info]) => {
+                        const card = document.querySelector(`.card[data-section="${section}"]`);
+                        if (card) {
+                            const bar = card.querySelector('.progress-fill');
+                            if (bar) {
+                                bar.style.width = info.value + '%';
+                                bar.textContent = info.text;
+                                bar.dataset.value = info.value;
+                            }
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn('No se pudo cargar desde localStorage:', e);
+            }
+        }
+        
+        function changeUser() {
+            document.getElementById('change-username').value = currentUser;
+            document.getElementById('modal-user').style.display = 'block';
+        }
+        
+        function changeUserConfirm() {
+            const newUser = document.getElementById('change-username').value.trim();
+            if (!newUser) {
+                showNotification('⚠️ Debe ingresar un nombre', 'error');
+                return;
+            }
+            
+            currentUser = newUser;
+            localStorage.setItem('currentUser', currentUser);
+            updateUserDisplay();
+            closeModal('modal-user');
+            showNotification('👤 Usuario establecido: ' + currentUser);
+        }
+        
+        function showHistory() {
+            const historyList = document.getElementById('history-list');
+            
+            if (modificationHistory.length === 0) {
+                historyList.innerHTML = '<p style="color: #6c757d;">No hay modificaciones registradas</p>';
+            } else {
+                historyList.innerHTML = modificationHistory.map((entry, index) => `
+                    <div class="history-item">
+                        <div>
+                            <span class="history-user">👤 ${entry.user}</span>
+                            <span class="history-time">📅 ${new Date(entry.timestamp).toLocaleString()}</span>
+                        </div>
+                        ${entry.comment ? `<div style="margin-top: 5px;">📝 ${entry.comment}</div>` : ''}
+                        <div style="margin-top: 5px;">
+                            <span class="badge badge-warning">Versión ${modificationHistory.length - index}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('modal-history').style.display = 'block';
+        }
+        
+        function clearHistory() {
+            if (confirm('¿Está seguro de limpiar todo el historial de modificaciones?')) {
+                modificationHistory = [];
+                localStorage.setItem('modificationHistory', JSON.stringify(modificationHistory));
+                showNotification('🗑️ Historial limpiado');
+                closeModal('modal-history');
+            }
+        }
+        
+        // Editar progreso
         function editProgress(section, element) {
             currentSection = section;
             currentProgressBar = element.querySelector('.progress-fill');
@@ -798,19 +1158,14 @@
                 currentProgressBar.style.width = newValue + '%';
                 currentProgressBar.textContent = newValue + '%';
                 currentProgressBar.dataset.value = newValue;
-                
-                // Actualizar stat number si existe
                 updateRelatedStats(currentSection, newValue);
+                markAsChanged();
             }
             
             closeModal('modal-progress');
-            showNotification('✅ Progreso actualizado a ' + newValue + '%');
-            
-            // Guardar en localStorage
-            saveToLocalStorage();
+            showNotification('✅ Progreso actualizado a ' + newValue + '% (Click en GUARDAR para confirmar)');
         }
         
-        // Ciclar entre estados
         function cycleStatus(element) {
             const statuses = ['pending', 'in-progress', 'completed'];
             const labels = ['Pendiente', 'En Progreso', 'Completado'];
@@ -821,37 +1176,30 @@
             const nextIndex = (currentIndex + 1) % statuses.length;
             const nextStatus = statuses[nextIndex];
             
-            // Actualizar badge
             element.className = 'status-badge status-' + nextStatus;
             element.textContent = labels[nextIndex];
             
-            // Actualizar item padre
             const taskItem = element.closest('.task-item');
             if (taskItem) {
                 taskItem.className = 'task-item ' + nextStatus;
-                
-                // Actualizar porcentaje basado en estado
-                const percentageSpan = element;
                 if (nextStatus === 'completed') {
-                    percentageSpan.textContent = '100%';
+                    element.textContent = '100%';
                 } else if (nextStatus === 'pending') {
-                    percentageSpan.textContent = '0%';
+                    element.textContent = '0%';
                 }
             }
             
-            // Actualizar timeline-item si existe
             const timelineItem = element.closest('.timeline-item');
             if (timelineItem) {
                 timelineItem.style.borderLeft = nextStatus === 'completed' ? '5px solid #4CAF50' :
                                                nextStatus === 'in-progress' ? '5px solid #FFA726' : '5px solid #EF5350';
             }
             
-            showNotification('🔄 Estado cambiado a: ' + labels[nextIndex]);
+            markAsChanged();
             updateAllProgressBars();
-            saveToLocalStorage();
+            showNotification('🔄 Estado cambiado a: ' + labels[nextIndex] + ' (Click en GUARDAR para confirmar)');
         }
         
-        // Editar porcentaje de tarea específica
         function editTaskPercentage(button) {
             currentTaskElement = button.closest('.task-item');
             const taskName = currentTaskElement.querySelector('span:first-child').textContent;
@@ -903,26 +1251,23 @@
             const newPercentage = document.getElementById('task-percentage').value;
             const newStatus = document.getElementById('task-status').value;
             
-            // Actualizar nombre
             const nameSpan = currentTaskElement.querySelector('span:first-child, h4');
             if (nameSpan) nameSpan.textContent = newName;
             
-            // Actualizar badge
             const badge = currentTaskElement.querySelector('.status-badge');
             if (badge) {
                 badge.textContent = newPercentage + '%';
                 badge.className = 'status-badge status-' + newStatus;
             }
             
-            // Actualizar clases del item
             if (currentTaskElement.classList.contains('task-item')) {
                 currentTaskElement.className = 'task-item ' + newStatus;
             }
             
+            markAsChanged();
             closeModal('modal-task');
-            showNotification('✅ Tarea actualizada exitosamente');
             updateAllProgressBars();
-            saveToLocalStorage();
+            showNotification('✅ Tarea actualizada (Click en GUARDAR para confirmar)');
         }
         
         function editSectionProgress(button) {
@@ -936,7 +1281,6 @@
         }
         
         function updateRelatedStats(section, value) {
-            // Actualizar estadísticas relacionadas
             const statNumbers = document.querySelectorAll('.stat-number');
             statNumbers.forEach(stat => {
                 if (stat.dataset.section === section) {
@@ -949,7 +1293,6 @@
             let value = element.textContent.replace('%', '').trim();
             if (isNaN(value)) return;
             
-            // Actualizar barra de progreso relacionada
             const progressBars = document.querySelectorAll('.progress-fill');
             progressBars.forEach(bar => {
                 if (bar.dataset.section === section) {
@@ -959,11 +1302,10 @@
                 }
             });
             
-            saveToLocalStorage();
+            markAsChanged();
         }
         
         function updateAllProgressBars() {
-            // Esta función recalcula los promedios de las secciones
             const cards = document.querySelectorAll('.card[data-section]');
             cards.forEach(card => {
                 const badges = card.querySelectorAll('.status-badge');
@@ -984,7 +1326,6 @@
                 }
             });
             
-            // Actualizar promedios generales
             updateGeneralProgress();
         }
         
@@ -1068,7 +1409,6 @@
             const section = document.getElementById('new-activity-section').value;
             const percentage = document.getElementById('new-activity-percentage').value;
             
-            // Encontrar la card correcta
             const card = document.querySelector(`.card[data-section="${section}"]`);
             if (card) {
                 const taskList = card.querySelector('.task-list');
@@ -1078,77 +1418,17 @@
                 newTask.innerHTML = `
                     <span>${name}</span>
                     <span class="status-badge status-${percentage >= 100 ? 'completed' : percentage > 0 ? 'in-progress' : 'pending'}" 
-                          onclick="cycleStatus(this)">${percentage}%</span>
+                          onclick="cycleStatus(this); markAsChanged()">${percentage}%</span>
                     <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                 `;
                 taskList.appendChild(newTask);
                 
+                markAsChanged();
                 updateAllProgressBars();
-                saveToLocalStorage();
-                showNotification('✅ Nueva actividad agregada: ' + name);
+                showNotification('✅ Nueva actividad agregada: ' + name + ' (Click en GUARDAR para confirmar)');
             }
             
             document.getElementById('modal-new-activity').remove();
-        }
-        
-        function saveToLocalStorage() {
-            try {
-                const data = {
-                    timestamp: new Date().toISOString(),
-                    progress: {},
-                    tasks: []
-                };
-                
-                // Guardar progresos
-                document.querySelectorAll('.progress-fill[data-value]').forEach(bar => {
-                    const section = bar.closest('.card')?.dataset.section || 'general';
-                    data.progress[section] = bar.dataset.value;
-                });
-                
-                // Guardar tareas
-                document.querySelectorAll('.task-item[data-id]').forEach(task => {
-                    data.tasks.push({
-                        id: task.dataset.id,
-                        name: task.querySelector('span:first-child').textContent,
-                        percentage: task.querySelector('.status-badge').textContent,
-                        status: task.className.includes('completed') ? 'completed' : 
-                                task.className.includes('in-progress') ? 'in-progress' : 'pending'
-                    });
-                });
-                
-                localStorage.setItem('subestacion-data', JSON.stringify(data));
-            } catch (e) {
-                console.warn('No se pudo guardar en localStorage:', e);
-            }
-        }
-        
-        function loadFromLocalStorage() {
-            try {
-                const saved = localStorage.getItem('subestacion-data');
-                if (!saved) return;
-                
-                const data = JSON.parse(saved);
-                console.log('Datos cargados del ' + data.timestamp);
-                
-                // Restaurar progresos
-                Object.entries(data.progress).forEach(([section, value]) => {
-                    const card = document.querySelector(`.card[data-section="${section}"]`);
-                    if (card) {
-                        const bar = card.querySelector('.progress-fill');
-                        if (bar) {
-                            bar.style.width = value + '%';
-                            bar.textContent = value + '%';
-                            bar.dataset.value = value;
-                        }
-                    }
-                });
-                
-                // Restaurar tareas (opcional - puede sobreescribir las existentes)
-                // Esto se puede habilitar si quieres persistencia completa
-                
-            } catch (e) {
-                console.warn('No se pudo cargar desde localStorage:', e);
-            }
         }
         
         function closeModal(modalId) {
@@ -1161,22 +1441,20 @@
             }
         }
         
-        // Auto-guardado periódico
+        // Auto-guardado periódico (solo datos, sin registro en historial)
         setInterval(() => {
-            saveToLocalStorage();
-        }, 10000); // Cada 10 segundos
+            if (hasUnsavedChanges) {
+                saveToLocalStorage();
+            }
+        }, 30000);
         
-        // Cargar datos al iniciar
-        window.addEventListener('load', () => {
-            loadFromLocalStorage();
-            console.log('✅ Sistema listo - Haz clic en los porcentajes o badges para editar');
-            console.log('💾 Los cambios se guardan automáticamente cada 10 segundos');
-            console.log('📅 Última actualización: ' + new Date().toLocaleString());
-        });
-        
-        // Guardar antes de cerrar
-        window.addEventListener('beforeunload', () => {
-            saveToLocalStorage();
+        // Advertencia al cerrar si hay cambios sin guardar
+        window.addEventListener('beforeunload', (e) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = 'Tiene cambios sin guardar. ¿Está seguro de salir?';
+                return e.returnValue;
+            }
         });
     </script>
 </body>
