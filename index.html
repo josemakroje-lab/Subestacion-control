@@ -786,5 +786,47 @@
         console.log('Sistema de control y seguimiento - Subestación 50 MVA');
         console.log('Fecha: ' + new Date().toLocaleDateString());
     </script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+<script>
+  // Configuración de Firebase (obtén estos datos de tu proyecto)
+  const firebaseConfig = {
+    apiKey: "TU_API_KEY",
+    authDomain: "tu-proyecto.firebaseapp.com",
+    projectId: "tu-proyecto",
+    storageBucket: "tu-proyecto.appspot.com",
+    messagingSenderId: "TU_SENDER_ID",
+    appId: "TU_APP_ID"
+  };
+  
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  
+  // Función para guardar actividades
+  function guardarActividad(tipo, datos) {
+    db.collection("actividades").add({
+      tipo: tipo,
+      datos: datos,
+      fecha: new Date().toISOString(),
+      usuario: "admin"
+    }).then(() => {
+      alert("Actividad guardada correctamente");
+    });
+  }
+  
+  // Función para cargar actividades
+  function cargarActividades(tipo) {
+    db.collection("actividades")
+      .where("tipo", "==", tipo)
+      .orderBy("fecha", "desc")
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          console.log(doc.data());
+          // Actualizar UI con los datos
+        });
+      });
+  }
+</script>
 </body>
 </html>
