@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control y Seguimiento - Subestación 50 MVA 230/13.8 kV</title>
+    <title>Control y Seguimiento - Subestación 45 MVA 230/13.8 kV</title>
     <style>
         * {
             margin: 0;
@@ -27,51 +27,53 @@
             overflow: hidden;
         }
         
-     <div class="header">
-    <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 30px;
+            position: relative;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        
         .logo-container {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    overflow: hidden;
-}
-
-.logo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.default-logo {
-    font-size: 3em;
-    color: #1e3c72;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-        <!-- LOGO AQUÍ -->
-        <div class="logo-container">
-            <img src="logo.jpeg" alt="Logo" class="logo" id="logo-img" 
-                 onerror="this.style.display='none'; document.getElementById('default-logo').style.display='flex';">
-            <div id="default-logo" class="default-logo" style="display: none;">
-                ⚡
-            </div>
-        </div>
-        <div>
-            <h1>Subestación de Potencia</h1>
-            <div class="subtitle">50 MVA - 230 kV / 13.8 kV | Sistema de Control y Seguimiento</div>
-        </div>
-    </div>
-    <div class="user-info" id="current-user-display">
-        👤 <span id="display-username">No identificado</span>
-    </div>
-</div>
+            width: 90px;
+            height: 90px;
+            min-width: 90px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 3px solid white;
+        }
+        
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .logo-placeholder {
+            font-size: 3.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+        }
+        
+        .header-text {
+            text-align: center;
         }
         
         .header h1 {
@@ -93,6 +95,7 @@
             padding: 8px 15px;
             border-radius: 20px;
             font-size: 0.9em;
+            backdrop-filter: blur(5px);
         }
         
         .save-bar {
@@ -102,6 +105,8 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .save-info {
@@ -131,10 +136,12 @@
             display: flex;
             background: #f8f9fa;
             border-bottom: 3px solid #dee2e6;
+            flex-wrap: wrap;
         }
         
         .nav-tab {
             flex: 1;
+            min-width: 150px;
             padding: 15px 20px;
             text-align: center;
             cursor: pointer;
@@ -199,6 +206,7 @@
             align-items: center;
             gap: 10px;
             justify-content: space-between;
+            flex-wrap: wrap;
         }
         
         .progress-bar {
@@ -227,6 +235,7 @@
             color: white;
             font-weight: bold;
             font-size: 0.9em;
+            min-width: 45px;
         }
         
         .task-list {
@@ -244,6 +253,8 @@
             align-items: center;
             border-left: 4px solid #dee2e6;
             transition: all 0.3s ease;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         
         .task-item:hover {
@@ -274,6 +285,7 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         
         .status-badge:hover {
@@ -304,6 +316,7 @@
             transition: all 0.3s ease;
             margin: 2px;
             font-size: 0.9em;
+            white-space: nowrap;
         }
         
         .btn-primary {
@@ -518,13 +531,67 @@
         .badge-success { background: #4CAF50; color: white; }
         .badge-warning { background: #FFA726; color: white; }
         .badge-danger { background: #EF5350; color: white; }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .logo-container {
+                width: 70px;
+                height: 70px;
+                min-width: 70px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .user-info {
+                position: static;
+                text-align: center;
+                margin-top: 10px;
+            }
+            
+            .save-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .nav-tab {
+                font-size: 0.9em;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚡ Subestación de Potencia</h1>
-            <div class="subtitle">50 MVA - 230 kV / 13.8 kV | Sistema de Control y Seguimiento</div>
+            <div class="header-content">
+                <div class="logo-container">
+                    <!-- 
+                    ╔══════════════════════════════════════════╗
+                    ║  CAMBIA ESTA LÍNEA POR LA RUTA DE TU   ║
+                    ║  LOGO: src="logo.png"                   ║
+                    ║  O URL: src="https://ejemplo.com/logo.png" ║
+                    ╚══════════════════════════════════════════╝
+                    -->
+                    <img src="logo.jpeg" 
+                         alt="Logo" 
+                         class="logo-img" 
+                         id="logo-img"
+                         onerror="this.style.display='none'; document.getElementById('logo-placeholder').style.display='flex';">
+                    <div id="logo-placeholder" class="logo-placeholder" style="display: none;">
+                        ⚡
+                    </div>
+                </div>
+                <div class="header-text">
+                    <h1>Subestación de Potencia</h1>
+                    <div class="subtitle">50 MVA - 230 kV / 13.8 kV | Sistema de Control y Seguimiento</div>
+                </div>
+            </div>
             <div class="user-info" id="current-user-display">
                 👤 <span id="display-username">No identificado</span>
             </div>
@@ -539,7 +606,7 @@
                     ⚠️ Cambios sin guardar
                 </span>
             </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <span class="last-save" id="last-save-info">Último guardado: Nunca</span>
                 <button class="btn btn-history" onclick="showHistory()">📋 Historial</button>
                 <button class="btn btn-primary" onclick="changeUser()">👤 Cambiar Usuario</button>
@@ -949,6 +1016,9 @@
         let hasUnsavedChanges = false;
         let modificationHistory = JSON.parse(localStorage.getItem('modificationHistory') || '[]');
         let lastSaveTime = localStorage.getItem('lastSaveTime') || null;
+        let currentProgressBar = null;
+        let currentSection = null;
+        let currentTaskElement = null;
         
         // Inicialización
         window.addEventListener('load', () => {
@@ -1005,7 +1075,6 @@
             }, 3000);
         }
         
-        // Función principal de guardado
         function saveChanges() {
             if (!currentUser) {
                 showNotification('⚠️ Debe identificarse primero. Use "Cambiar Usuario"', 'error');
@@ -1027,12 +1096,10 @@
                 return;
             }
             
-            // Actualizar usuario actual
             currentUser = username;
             localStorage.setItem('currentUser', currentUser);
             updateUserDisplay();
             
-            // Guardar datos
             const saveData = {
                 timestamp: new Date().toISOString(),
                 user: username,
@@ -1040,15 +1107,12 @@
                 data: getAllCurrentData()
             };
             
-            // Agregar al historial
             modificationHistory.unshift(saveData);
-            if (modificationHistory.length > 50) modificationHistory.pop(); // Mantener solo últimos 50
+            if (modificationHistory.length > 50) modificationHistory.pop();
             localStorage.setItem('modificationHistory', JSON.stringify(modificationHistory));
             
-            // Guardar en localStorage
             saveToLocalStorage();
             
-            // Actualizar estado
             lastSaveTime = new Date().toISOString();
             localStorage.setItem('lastSaveTime', lastSaveTime);
             hasUnsavedChanges = false;
@@ -1065,7 +1129,6 @@
                 tasks: []
             };
             
-            // Guardar progresos de secciones
             document.querySelectorAll('.progress-fill[data-value]').forEach(bar => {
                 const card = bar.closest('.card');
                 const section = card?.dataset?.section || 'general';
@@ -1075,7 +1138,6 @@
                 };
             });
             
-            // Guardar tareas
             document.querySelectorAll('.task-item[data-id]').forEach(task => {
                 const badge = task.querySelector('.status-badge');
                 data.tasks.push({
@@ -1106,7 +1168,6 @@
                 
                 const data = JSON.parse(saved);
                 
-                // Restaurar progresos
                 if (data.progress) {
                     Object.entries(data.progress).forEach(([section, info]) => {
                         const card = document.querySelector(`.card[data-section="${section}"]`);
@@ -1176,7 +1237,6 @@
             }
         }
         
-        // Editar progreso
         function editProgress(section, element) {
             currentSection = section;
             currentProgressBar = element.querySelector('.progress-fill');
@@ -1480,14 +1540,12 @@
             }
         }
         
-        // Auto-guardado periódico (solo datos, sin registro en historial)
         setInterval(() => {
             if (hasUnsavedChanges) {
                 saveToLocalStorage();
             }
         }, 30000);
         
-        // Advertencia al cerrar si hay cambios sin guardar
         window.addEventListener('beforeunload', (e) => {
             if (hasUnsavedChanges) {
                 e.preventDefault();
