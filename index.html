@@ -27,12 +27,25 @@
             overflow: hidden;
         }
         
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 20px 30px;
-            text-align: center;
-            position: relative;
+     <div class="header">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+        <!-- LOGO AQUÍ -->
+        <div class="logo-container">
+            <img src="TU-LOGO.png" alt="Logo" class="logo" id="logo-img" 
+                 onerror="this.style.display='none'; document.getElementById('default-logo').style.display='flex';">
+            <div id="default-logo" class="default-logo" style="display: none;">
+                ⚡
+            </div>
+        </div>
+        <div>
+            <h1>Subestación de Potencia</h1>
+            <div class="subtitle">50 MVA - 230 kV / 13.8 kV | Sistema de Control y Seguimiento</div>
+        </div>
+    </div>
+    <div class="user-info" id="current-user-display">
+        👤 <span id="display-username">No identificado</span>
+    </div>
+</div>
         }
         
         .header h1 {
