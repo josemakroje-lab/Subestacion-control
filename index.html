@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control y Seguimiento - Subestación 50 MVA 230/13.8 kV</title>
+    
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -98,6 +103,26 @@
             border-radius: 20px;
             font-size: 0.9em;
             backdrop-filter: blur(5px);
+        }
+        
+        .connection-status {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .status-online {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .status-offline {
+            background: #EF5350;
+            color: white;
         }
         
         .save-bar {
@@ -534,6 +559,22 @@
         .badge-warning { background: #FFA726; color: white; }
         .badge-danger { background: #EF5350; color: white; }
 
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-size: 1.2em;
+            color: #2a5298;
+        }
+
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -555,6 +596,12 @@
                 margin-top: 10px;
             }
             
+            .connection-status {
+                position: static;
+                text-align: center;
+                margin-top: 5px;
+            }
+            
             .save-bar {
                 flex-direction: column;
                 align-items: stretch;
@@ -568,8 +615,16 @@
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div style="font-size: 3em;">☁️</div>
+        <div>Sincronizando con la nube...</div>
+    </div>
+
     <div class="container">
         <div class="header">
+            <div class="connection-status status-offline" id="connection-status">
+                🔴 Sin conexión
+            </div>
             <div class="header-content">
                 <div class="logo-container">
                     <img src="logo.jpeg" 
@@ -593,8 +648,8 @@
         
         <div class="save-bar">
             <div class="save-info">
-                <button class="btn btn-save" onclick="saveChanges()" title="Guardar todos los cambios">
-                    💾 GUARDAR CAMBIOS
+                <button class="btn btn-save" onclick="saveChanges()" title="Guardar en la nube">
+                    ☁️ GUARDAR EN LA NUBE
                 </button>
                 <span class="unsaved-indicator" id="unsaved-indicator">
                     ⚠️ Cambios sin guardar
@@ -604,6 +659,7 @@
                 <span class="last-save" id="last-save-info">Último guardado: Nunca</span>
                 <button class="btn btn-history" onclick="showHistory()">📋 Historial</button>
                 <button class="btn btn-primary" onclick="changeUser()">👤 Cambiar Usuario</button>
+                <button class="btn btn-warning" onclick="syncNow()">🔄 Sincronizar</button>
             </div>
         </div>
         
@@ -911,7 +967,7 @@
         </div>
     </div>
     
-    <!-- Modal para editar progreso -->
+    <!-- Modales -->
     <div id="modal-progress" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('modal-progress')">&times;</span>
@@ -932,7 +988,6 @@
         </div>
     </div>
     
-    <!-- Modal para editar tarea -->
     <div id="modal-task" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('modal-task')">&times;</span>
@@ -959,24 +1014,23 @@
         </div>
     </div>
     
-    <!-- Modal para guardar con usuario -->
     <div id="modal-save" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('modal-save')">&times;</span>
-            <h2>💾 Confirmar Guardado</h2>
+            <h2>☁️ Guardar en la Nube</h2>
+            <p style="color: #6c757d; margin-bottom: 15px;">Los cambios se guardarán y estarán disponibles en todos los dispositivos.</p>
             <div class="form-group">
-                <label>👤 Nombre de quien realiza la modificación *</label>
+                <label>👤 Nombre de quien modifica *</label>
                 <input type="text" id="save-username" placeholder="Ingrese su nombre completo" required>
             </div>
             <div class="form-group">
                 <label>📝 Comentario (opcional)</label>
                 <textarea id="save-comment" rows="3" placeholder="Describa los cambios realizados..."></textarea>
             </div>
-            <button onclick="confirmSave()" class="btn btn-save" style="width: 100%;">💾 Guardar Cambios</button>
+            <button onclick="confirmSave()" class="btn btn-save" style="width: 100%;">☁️ Guardar en la Nube</button>
         </div>
     </div>
     
-    <!-- Modal para cambiar usuario -->
     <div id="modal-user" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('modal-user')">&times;</span>
@@ -989,32 +1043,53 @@
         </div>
     </div>
     
-    <!-- Modal de historial -->
     <div id="modal-history" class="modal">
         <div class="modal-content" style="max-width: 700px;">
             <span class="close" onclick="closeModal('modal-history')">&times;</span>
             <h2>📋 Historial de Modificaciones</h2>
             <div class="history-list" id="history-list">
-                <p style="color: #6c757d;">No hay modificaciones registradas</p>
+                <p style="color: #6c757d;">Cargando historial...</p>
             </div>
             <button onclick="clearHistory()" class="btn btn-danger" style="margin-top: 15px;">🗑️ Limpiar Historial</button>
         </div>
     </div>
     
-    <!-- Notificación -->
     <div id="notification" class="notification"></div>
     
     <script>
+        // ═══════════════════════════════════════════
+        // CONFIGURACIÓN DE FIREBASE
+        // ═══════════════════════════════════════════
+        const firebaseConfig = {
+            apiKey: "AIzaSyA16Rx9Q-LfB8wIqtLi8Y0eqO40fNWRSbc",
+            authDomain: "subestacion-control.firebaseapp.com",
+            projectId: "subestacion-control",
+            storageBucket: "subestacion-control.firebasestorage.app",
+            messagingSenderId: "486932126194",
+            appId: "1:486932126194:web:ad12f30655e1893046736b"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // Habilitar conexión offline
+        db.enablePersistence()
+            .then(() => console.log('✅ Soporte offline habilitado'))
+            .catch((err) => console.warn('⚠️ Soporte offline limitado:', err));
+        
         // ═══════════════════════════════════════════
         // VARIABLES GLOBALES
         // ═══════════════════════════════════════════
         let currentUser = localStorage.getItem('currentUser') || '';
         let hasUnsavedChanges = false;
-        let modificationHistory = JSON.parse(localStorage.getItem('modificationHistory') || '[]');
+        let modificationHistory = [];
         let lastSaveTime = localStorage.getItem('lastSaveTime') || null;
         let currentProgressBar = null;
         let currentSection = null;
         let currentTaskElement = null;
+        let isOnline = false;
+        let lastCloudUpdate = null;
         
         // ═══════════════════════════════════════════
         // INICIALIZACIÓN
@@ -1022,22 +1097,46 @@
         window.addEventListener('load', () => {
             updateUserDisplay();
             updateLastSaveDisplay();
+            updateConnectionStatus();
             
-            // CARGAR DATOS GUARDADOS PRIMERO
-            loadFromLocalStorage();
+            // Cargar datos desde la nube
+            loadFromCloud();
             
-            // Actualizar dashboard automáticamente
-            updateDashboardFromTasks();
+            // Escuchar cambios en tiempo real
+            listenForChanges();
             
             if (!currentUser) {
-                setTimeout(() => {
-                    changeUser();
-                }, 1000);
+                setTimeout(() => changeUser(), 1000);
             }
             
-            console.log('✅ Sistema listo - Usuario: ' + (currentUser || 'No definido'));
-            console.log('💾 Click en "GUARDAR CAMBIOS" para registrar modificaciones');
-            console.log('📊 Dashboard se actualiza automáticamente al modificar tareas');
+            console.log('✅ Sistema conectado a Firebase');
+            console.log('📊 Proyecto: subestacion-control');
+            console.log('☁️ Datos se sincronizan en todos los dispositivos');
+        });
+        
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('connection-status');
+            if (navigator.onLine) {
+                statusEl.textContent = '🟢 En línea - Nube';
+                statusEl.className = 'connection-status status-online';
+                isOnline = true;
+            } else {
+                statusEl.textContent = '🔴 Sin conexión';
+                statusEl.className = 'connection-status status-offline';
+                isOnline = false;
+            }
+        }
+        
+        // Escuchar cambios de conexión
+        window.addEventListener('online', () => {
+            updateConnectionStatus();
+            showNotification('✅ Conexión restablecida - Sincronizando...');
+            syncNow();
+        });
+        
+        window.addEventListener('offline', () => {
+            updateConnectionStatus();
+            showNotification('⚠️ Sin conexión - Los cambios se guardarán localmente');
         });
         
         function updateUserDisplay() {
@@ -1055,29 +1154,28 @@
         function markAsChanged() {
             hasUnsavedChanges = true;
             document.getElementById('unsaved-indicator').style.display = 'inline';
-            // Actualizar dashboard automáticamente
             updateDashboardFromTasks();
         }
         
         function showTab(tabName) {
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.classList.remove('active'));
-            
-            const tabs = document.querySelectorAll('.nav-tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             
             document.getElementById(tabName).classList.add('active');
             
-            // Actualizar dashboard si se selecciona esa pestaña
-            if (tabName === 'dashboard') {
-                updateDashboardFromTasks();
-            }
+            if (tabName === 'dashboard') updateDashboardFromTasks();
             
-            // Encontrar el botón clickeado y activarlo
-            const clickedTab = Array.from(tabs).find(tab => tab.textContent.includes(tabName === 'dashboard' ? 'Dashboard' : 
-                                                                                       tabName === 'civil' ? 'Obra Civil' : 
-                                                                                       tabName === 'electromecanica' ? 'Electromecánica' : 'Puesta en Marcha'));
-            if (clickedTab) clickedTab.classList.add('active');
+            const tabMap = {
+                'dashboard': 'Dashboard',
+                'civil': 'Obra Civil',
+                'electromecanica': 'Electromecánica',
+                'puesta-marcha': 'Puesta en Marcha'
+            };
+            
+            const targetText = tabMap[tabName] || '';
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.textContent.includes(targetText)) tab.classList.add('active');
+            });
         }
         
         function showNotification(message, type = 'success') {
@@ -1085,18 +1183,73 @@
             notification.textContent = message;
             notification.style.background = type === 'success' ? '#4CAF50' : '#EF5350';
             notification.style.display = 'block';
-            
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
+            setTimeout(() => notification.style.display = 'none', 3000);
+        }
+        
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
         }
         
         // ═══════════════════════════════════════════
-        // FUNCIONES DE GUARDADO Y CARGA
+        // FUNCIONES DE FIREBASE
         // ═══════════════════════════════════════════
+        function loadFromCloud() {
+            showLoading();
+            console.log('☁️ Cargando datos desde Firebase...');
+            
+            db.collection("estadoActual").doc("subestacion")
+                .get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const cloudData = doc.data();
+                        console.log('✅ Datos cargados desde la nube');
+                        console.log('👤 Última modificación:', cloudData.ultimoUsuario);
+                        console.log('📅 Fecha:', cloudData.ultimaModificacion?.toDate());
+                        
+                        lastCloudUpdate = cloudData.ultimaModificacion?.toDate();
+                        restoreData(cloudData.data);
+                        updateLastSaveDisplay();
+                    } else {
+                        console.log('📦 No hay datos en la nube - Usando valores predeterminados');
+                    }
+                    hideLoading();
+                })
+                .catch((error) => {
+                    console.error('❌ Error al cargar:', error);
+                    showNotification('⚠️ Usando datos locales', 'error');
+                    loadLocalFallback();
+                    hideLoading();
+                });
+        }
+        
+        function listenForChanges() {
+            db.collection("estadoActual").doc("subestacion")
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const cloudData = doc.data();
+                        const updateTime = cloudData.ultimaModificacion?.toDate();
+                        
+                        // Si el cambio es de otro usuario y es más reciente
+                        if (cloudData.ultimoUsuario !== currentUser && 
+                            (!lastCloudUpdate || updateTime > lastCloudUpdate)) {
+                            console.log('🔄 Cambios detectados de:', cloudData.ultimoUsuario);
+                            restoreData(cloudData.data);
+                            lastCloudUpdate = updateTime;
+                            showNotification('📲 Datos actualizados por ' + cloudData.ultimoUsuario);
+                        }
+                    }
+                }, (error) => {
+                    console.warn('⚠️ Error en listener:', error);
+                });
+        }
+        
         function saveChanges() {
             if (!currentUser) {
-                showNotification('⚠️ Debe identificarse primero. Use "Cambiar Usuario"', 'error');
+                showNotification('⚠️ Debe identificarse primero', 'error');
                 changeUser();
                 return;
             }
@@ -1119,34 +1272,123 @@
             localStorage.setItem('currentUser', currentUser);
             updateUserDisplay();
             
-            const saveData = {
-                timestamp: new Date().toISOString(),
-                user: username,
-                comment: comment,
-                data: getAllCurrentData()
-            };
+            const currentData = getAllCurrentData();
             
-            modificationHistory.unshift(saveData);
-            if (modificationHistory.length > 50) modificationHistory.pop();
-            localStorage.setItem('modificationHistory', JSON.stringify(modificationHistory));
+            showLoading();
             
-            saveToLocalStorage();
-            
-            lastSaveTime = new Date().toISOString();
-            localStorage.setItem('lastSaveTime', lastSaveTime);
-            hasUnsavedChanges = false;
-            document.getElementById('unsaved-indicator').style.display = 'none';
-            updateLastSaveDisplay();
-            
-            closeModal('modal-save');
-            showNotification('✅ Cambios guardados por: ' + username);
+            // Guardar en Firebase
+            db.collection("estadoActual").doc("subestacion").set({
+                data: currentData,
+                ultimoUsuario: username,
+                ultimaModificacion: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                console.log('✅ Datos guardados en la nube');
+                
+                // Guardar en historial
+                return db.collection("historialModificaciones").add({
+                    usuario: username,
+                    comentario: comment,
+                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
+                    resumen: {
+                        general: currentData.progress?.general?.value || 0,
+                        civil: currentData.progress?.['civil-dashboard']?.value || 0,
+                        electromecanica: currentData.progress?.['electromecanica-dashboard']?.value || 0,
+                        puestaMarcha: currentData.progress?.['puesta-marcha-dashboard']?.value || 0
+                    }
+                });
+            })
+            .then(() => {
+                lastSaveTime = new Date().toISOString();
+                localStorage.setItem('lastSaveTime', lastSaveTime);
+                hasUnsavedChanges = false;
+                document.getElementById('unsaved-indicator').style.display = 'none';
+                updateLastSaveDisplay();
+                
+                closeModal('modal-save');
+                hideLoading();
+                showNotification('☁️ Guardado en la nube por: ' + username);
+            })
+            .catch((error) => {
+                console.error('❌ Error al guardar:', error);
+                hideLoading();
+                
+                // Guardar localmente como respaldo
+                saveToLocalStorage();
+                showNotification('⚠️ Error de conexión - Guardado local', 'error');
+            });
         }
         
+        function syncNow() {
+            showNotification('🔄 Sincronizando...');
+            loadFromCloud();
+        }
+        
+        function loadLocalFallback() {
+            try {
+                const saved = localStorage.getItem('subestacion-data');
+                if (!saved) return;
+                const data = JSON.parse(saved);
+                restoreData(data);
+                console.log('📂 Datos cargados desde respaldo local');
+            } catch (e) {
+                console.warn('No hay datos locales');
+            }
+        }
+        
+        function saveToLocalStorage() {
+            try {
+                const data = getAllCurrentData();
+                localStorage.setItem('subestacion-data', JSON.stringify(data));
+            } catch (e) {
+                console.warn('No se pudo guardar localmente');
+            }
+        }
+        
+        function restoreData(data) {
+            if (!data) return;
+            
+            // Restaurar progresos
+            if (data.progress) {
+                Object.entries(data.progress).forEach(([section, info]) => {
+                    let bar = document.querySelector(`.card[data-section="${section}"] .progress-fill`);
+                    if (!bar) bar = document.getElementById('progress-' + section);
+                    if (bar) {
+                        bar.style.width = info.value + '%';
+                        bar.textContent = info.value + '%';
+                        bar.dataset.value = info.value;
+                    }
+                });
+            }
+            
+            // Restaurar tareas
+            if (data.tasks && data.tasks.length > 0) {
+                data.tasks.forEach(savedTask => {
+                    const taskElement = document.querySelector(`.task-item[data-id="${savedTask.id}"]`);
+                    if (taskElement) {
+                        const nameSpan = taskElement.querySelector('span:first-child');
+                        if (nameSpan && savedTask.name) nameSpan.textContent = savedTask.name;
+                        
+                        const badge = taskElement.querySelector('.status-badge');
+                        if (badge) {
+                            badge.textContent = savedTask.percentage;
+                            badge.className = 'status-badge status-' + savedTask.status;
+                        }
+                        
+                        taskElement.className = 'task-item ' + savedTask.status;
+                    }
+                });
+            }
+            
+            updateAllProgressBars();
+            updateDashboardFromTasks();
+        }
+        
+        // ═══════════════════════════════════════════
+        // OBTENER DATOS ACTUALES
+        // ═══════════════════════════════════════════
         function getAllCurrentData() {
-            const data = {
-                progress: {},
-                tasks: []
-            };
+            const data = { progress: {}, tasks: [] };
             
             document.querySelectorAll('.progress-fill[data-value]').forEach(bar => {
                 const card = bar.closest('.card');
@@ -1172,99 +1414,21 @@
             return data;
         }
         
-        function saveToLocalStorage() {
-            try {
-                const data = getAllCurrentData();
-                localStorage.setItem('subestacion-data', JSON.stringify(data));
-                console.log('💾 Datos guardados exitosamente');
-                console.log('📊 Secciones guardadas:', Object.keys(data.progress).length);
-                console.log('📋 Tareas guardadas:', data.tasks.length);
-            } catch (e) {
-                console.error('❌ No se pudo guardar en localStorage:', e);
-                showNotification('Error al guardar: ' + e.message, 'error');
-            }
-        }
-        
-        function loadFromLocalStorage() {
-            try {
-                const saved = localStorage.getItem('subestacion-data');
-                if (!saved) {
-                    console.log('📦 No hay datos guardados, usando valores predeterminados');
-                    return;
-                }
-                
-                const data = JSON.parse(saved);
-                console.log('📂 Cargando datos guardados...');
-                
-                // Restaurar progresos de secciones
-                if (data.progress) {
-                    Object.entries(data.progress).forEach(([section, info]) => {
-                        // Buscar por data-section o por id
-                        let bar = document.querySelector(`.card[data-section="${section}"] .progress-fill`);
-                        if (!bar) {
-                            bar = document.getElementById('progress-' + section);
-                        }
-                        if (bar) {
-                            bar.style.width = info.value + '%';
-                            bar.textContent = info.value + '%';
-                            bar.dataset.value = info.value;
-                            console.log(`  ✅ ${section}: ${info.value}%`);
-                        }
-                    });
-                }
-                
-                // Restaurar tareas
-                if (data.tasks && data.tasks.length > 0) {
-                    console.log(`  📋 Restaurando ${data.tasks.length} tareas...`);
-                    data.tasks.forEach(savedTask => {
-                        const taskElement = document.querySelector(`.task-item[data-id="${savedTask.id}"]`);
-                        if (taskElement) {
-                            const nameSpan = taskElement.querySelector('span:first-child');
-                            if (nameSpan && savedTask.name) {
-                                nameSpan.textContent = savedTask.name;
-                            }
-                            
-                            const badge = taskElement.querySelector('.status-badge');
-                            if (badge) {
-                                badge.textContent = savedTask.percentage;
-                                badge.className = 'status-badge status-' + savedTask.status;
-                            }
-                            
-                            taskElement.className = 'task-item ' + savedTask.status;
-                        }
-                    });
-                }
-                
-                // Actualizar dashboard después de cargar
-                updateDashboardFromTasks();
-                console.log('✅ Datos cargados correctamente');
-                
-            } catch (e) {
-                console.error('❌ Error al cargar datos:', e);
-            }
-        }
-        
         // ═══════════════════════════════════════════
         // ACTUALIZACIÓN AUTOMÁTICA DEL DASHBOARD
         // ═══════════════════════════════════════════
         function updateDashboardFromTasks() {
-            console.log('🔄 Actualizando dashboard automáticamente...');
-            
-            // Calcular promedio de Obra Civil
             const civilSections = ['movimiento-tierras', 'cimentaciones', 'estructuras', 'drenajes'];
             const civilAvg = calculateAverageProgress(civilSections);
             updateDashboardCard('civil-dashboard', civilAvg);
             
-            // Calcular promedio de Electromecánica
             const electromecanicaSections = ['transformador', 'alta-tension', 'tableros'];
             const electromecanicaAvg = calculateAverageProgress(electromecanicaSections);
             updateDashboardCard('electromecanica-dashboard', electromecanicaAvg);
             
-            // Calcular promedio de Puesta en Marcha
             const puestaMarchaAvg = calculatePuestaMarchaProgress();
             updateDashboardCard('puesta-marcha-dashboard', puestaMarchaAvg);
             
-            // Calcular promedio General
             const generalAvg = Math.round((civilAvg + electromecanicaAvg + puestaMarchaAvg) / 3);
             updateDashboardCard('general', generalAvg);
         }
@@ -1280,12 +1444,10 @@
                     if (badges.length > 0) {
                         let sectionTotal = 0;
                         badges.forEach(badge => {
-                            const text = badge.textContent.replace('%', '').replace('Completado', '100')
-                                          .replace('En Progreso', '50').replace('Pendiente', '0');
+                            const text = badge.textContent.replace('%', '');
                             sectionTotal += parseInt(text) || 0;
                         });
-                        const sectionAvg = Math.round(sectionTotal / badges.length);
-                        totalPercentage += sectionAvg;
+                        totalPercentage += Math.round(sectionTotal / badges.length);
                         count++;
                     }
                 }
@@ -1303,9 +1465,8 @@
                 const badge = item.querySelector('.status-badge');
                 if (badge) {
                     const text = badge.textContent;
-                    if (text.includes('Completado')) totalPercentage += 100;
-                    else if (text.includes('En Progreso')) totalPercentage += 50;
-                    else totalPercentage += 0;
+                    if (text.includes('Completado') || text === '100%') totalPercentage += 100;
+                    else if (text.includes('En Progreso') || text === '50%') totalPercentage += 50;
                 }
             });
             
@@ -1321,10 +1482,7 @@
                 progressBar.textContent = value + '%';
                 progressBar.dataset.value = value;
             }
-            
-            if (statNumber) {
-                statNumber.textContent = value + '%';
-            }
+            if (statNumber) statNumber.textContent = value + '%';
         }
         
         // ═══════════════════════════════════════════
@@ -1343,7 +1501,6 @@
         
         function saveProgress(event) {
             event.preventDefault();
-            
             const newValue = document.getElementById('progress-slider').value;
             
             if (currentProgressBar) {
@@ -1355,12 +1512,11 @@
             
             closeModal('modal-progress');
             updateDashboardFromTasks();
-            showNotification('✅ Progreso actualizado a ' + newValue + '% (Click en GUARDAR para confirmar)');
+            showNotification('✅ Progreso: ' + newValue + '% (Guarde para sincronizar)');
         }
         
         function cycleStatus(element) {
             const statuses = ['pending', 'in-progress', 'completed'];
-            const labels = ['Pendiente', 'En Progreso', 'Completado'];
             const percentages = ['0%', '50%', '100%'];
             const currentStatus = element.classList.contains('status-completed') ? 'completed' :
                                   element.classList.contains('status-in-progress') ? 'in-progress' : 'pending';
@@ -1373,19 +1529,11 @@
             element.textContent = percentages[nextIndex];
             
             const taskItem = element.closest('.task-item');
-            if (taskItem) {
-                taskItem.className = 'task-item ' + nextStatus;
-            }
-            
-            const timelineItem = element.closest('.timeline-item');
-            if (timelineItem) {
-                timelineItem.style.borderLeft = nextStatus === 'completed' ? '5px solid #4CAF50' :
-                                               nextStatus === 'in-progress' ? '5px solid #FFA726' : '5px solid #EF5350';
-            }
+            if (taskItem) taskItem.className = 'task-item ' + nextStatus;
             
             markAsChanged();
             updateAllProgressBars();
-            showNotification('🔄 Estado cambiado a: ' + labels[nextIndex] + ' (Dashboard actualizado)');
+            showNotification('🔄 Estado: ' + percentages[nextIndex] + ' (Dashboard actualizado)');
         }
         
         function editTaskPercentage(button) {
@@ -1432,7 +1580,6 @@
         
         function saveTask(event) {
             event.preventDefault();
-            
             if (!currentTaskElement) return;
             
             const newName = document.getElementById('task-name').value;
@@ -1462,22 +1609,17 @@
             const card = button.closest('.card');
             const progressBar = card.querySelector('.progress-fill');
             const sectionName = card.dataset.section;
-            
-            if (progressBar && sectionName) {
-                editProgress(sectionName, card.querySelector('.progress-bar'));
-            }
+            if (progressBar && sectionName) editProgress(sectionName, card.querySelector('.progress-bar'));
         }
         
         function updateAllProgressBars() {
-            const cards = document.querySelectorAll('.card[data-section]');
-            cards.forEach(card => {
+            document.querySelectorAll('.card[data-section]').forEach(card => {
                 const badges = card.querySelectorAll('.status-badge');
                 if (badges.length === 0) return;
                 
                 let totalPercentage = 0;
                 badges.forEach(badge => {
-                    const text = badge.textContent.replace('%', '');
-                    totalPercentage += parseInt(text) || 0;
+                    totalPercentage += parseInt(badge.textContent.replace('%', '')) || 0;
                 });
                 
                 const average = Math.round(totalPercentage / badges.length);
@@ -1493,37 +1635,37 @@
         }
         
         // ═══════════════════════════════════════════
-        // AGREGAR NUEVAS ACTIVIDADES
+        // AGREGAR ACTIVIDADES
         // ═══════════════════════════════════════════
         function addNewActivity(type) {
-            const template = document.createElement('div');
-            template.innerHTML = `
-                <div class="modal" style="display: block;" id="modal-new-activity">
-                    <div class="modal-content">
-                        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-                        <h2>Agregar Nueva Actividad - ${type}</h2>
-                        <form onsubmit="addActivity(event, '${type}')">
-                            <div class="form-group">
-                                <label>Nombre de la Actividad</label>
-                                <input type="text" id="new-activity-name" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Sección</label>
-                                <select id="new-activity-section">
-                                    ${getSectionsForType(type)}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Porcentaje Inicial (%)</label>
-                                <input type="number" id="new-activity-percentage" min="0" max="100" value="0" required>
-                            </div>
-                            <button type="submit" class="btn btn-success" style="width: 100%;">✅ Agregar Actividad</button>
-                        </form>
-                    </div>
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            modal.id = 'modal-new-activity';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                    <h2>Agregar Nueva Actividad - ${type === 'civil' ? 'Obra Civil' : type === 'electromecanica' ? 'Electromecánica' : 'Puesta en Marcha'}</h2>
+                    <form onsubmit="addActivity(event, '${type}')">
+                        <div class="form-group">
+                            <label>Nombre de la Actividad</label>
+                            <input type="text" id="new-activity-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sección</label>
+                            <select id="new-activity-section">
+                                ${getSectionsForType(type)}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Porcentaje Inicial (%)</label>
+                            <input type="number" id="new-activity-percentage" min="0" max="100" value="0" required>
+                        </div>
+                        <button type="submit" class="btn btn-success" style="width: 100%;">✅ Agregar Actividad</button>
+                    </form>
                 </div>
             `;
-            
-            document.body.appendChild(template.firstElementChild);
+            document.body.appendChild(modal);
         }
         
         function getSectionsForType(type) {
@@ -1560,15 +1702,14 @@
                 newTask.dataset.id = 'new_' + Date.now();
                 newTask.innerHTML = `
                     <span>${name}</span>
-                    <span class="status-badge status-${status}" 
-                          onclick="cycleStatus(this); markAsChanged()">${percentage}%</span>
+                    <span class="status-badge status-${status}" onclick="cycleStatus(this); markAsChanged()">${percentage}%</span>
                     <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
                 `;
                 taskList.appendChild(newTask);
                 
                 markAsChanged();
                 updateAllProgressBars();
-                showNotification('✅ Nueva actividad agregada: ' + name + ' (Dashboard actualizado)');
+                showNotification('✅ Actividad agregada: ' + name);
             }
             
             document.getElementById('modal-new-activity').remove();
@@ -1588,43 +1729,70 @@
                 showNotification('⚠️ Debe ingresar un nombre', 'error');
                 return;
             }
-            
             currentUser = newUser;
             localStorage.setItem('currentUser', currentUser);
             updateUserDisplay();
             closeModal('modal-user');
-            showNotification('👤 Usuario establecido: ' + currentUser);
+            showNotification('👤 Usuario: ' + currentUser);
         }
         
         function showHistory() {
             const historyList = document.getElementById('history-list');
-            
-            if (modificationHistory.length === 0) {
-                historyList.innerHTML = '<p style="color: #6c757d;">No hay modificaciones registradas</p>';
-            } else {
-                historyList.innerHTML = modificationHistory.map((entry, index) => `
-                    <div class="history-item">
-                        <div>
-                            <span class="history-user">👤 ${entry.user}</span>
-                            <span class="history-time">📅 ${new Date(entry.timestamp).toLocaleString()}</span>
-                        </div>
-                        ${entry.comment ? `<div style="margin-top: 5px;">📝 ${entry.comment}</div>` : ''}
-                        <div style="margin-top: 5px;">
-                            <span class="badge badge-warning">Versión ${modificationHistory.length - index}</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-            
+            historyList.innerHTML = '<p style="color: #6c757d;">Cargando historial...</p>';
             document.getElementById('modal-history').style.display = 'block';
+            
+            db.collection("historialModificaciones")
+                .orderBy("fecha", "desc")
+                .limit(50)
+                .get()
+                .then((snapshot) => {
+                    if (snapshot.empty) {
+                        historyList.innerHTML = '<p style="color: #6c757d;">No hay modificaciones registradas</p>';
+                    } else {
+                        modificationHistory = [];
+                        historyList.innerHTML = '';
+                        snapshot.forEach((doc) => {
+                            const entry = doc.data();
+                            modificationHistory.push(entry);
+                            const date = entry.fecha ? entry.fecha.toDate() : new Date();
+                            historyList.innerHTML += `
+                                <div class="history-item">
+                                    <div>
+                                        <span class="history-user">👤 ${entry.usuario}</span>
+                                        <span class="history-time">📅 ${date.toLocaleString()}</span>
+                                    </div>
+                                    ${entry.comentario ? `<div style="margin-top: 5px;">📝 ${entry.comentario}</div>` : ''}
+                                    ${entry.resumen ? `
+                                        <div style="margin-top: 5px; font-size: 0.8em; color: #6c757d;">
+                                            📊 Gral: ${entry.resumen.general || 0}% | 
+                                            🏗️ Civil: ${entry.resumen.civil || 0}% | 
+                                            ⚙️ Elec: ${entry.resumen.electromecanica || 0}% | 
+                                            🔌 PM: ${entry.resumen.puestaMarcha || 0}%
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        });
+                    }
+                })
+                .catch((error) => {
+                    historyList.innerHTML = '<p style="color: #EF5350;">Error al cargar historial</p>';
+                });
         }
         
         function clearHistory() {
-            if (confirm('¿Está seguro de limpiar todo el historial de modificaciones?')) {
-                modificationHistory = [];
-                localStorage.setItem('modificationHistory', JSON.stringify(modificationHistory));
-                showNotification('🗑️ Historial limpiado');
-                closeModal('modal-history');
+            if (confirm('¿Está seguro de limpiar todo el historial de la nube?')) {
+                db.collection("historialModificaciones").get()
+                    .then((snapshot) => {
+                        const batch = db.batch();
+                        snapshot.forEach((doc) => batch.delete(doc.ref));
+                        return batch.commit();
+                    })
+                    .then(() => {
+                        showNotification('🗑️ Historial limpiado');
+                        closeModal('modal-history');
+                    })
+                    .catch(() => showNotification('Error al limpiar', 'error'));
             }
         }
         
@@ -1638,22 +1806,17 @@
             }
         }
         
-        // Auto-guardado periódico
+        // Auto-guardado local periódico
         setInterval(() => {
             if (hasUnsavedChanges) {
                 saveToLocalStorage();
-                console.log('⏰ Auto-guardado realizado');
+                console.log('⏰ Respaldo local automático');
             }
         }, 30000);
         
-        // Advertencia al cerrar
-        window.addEventListener('beforeunload', (e) => {
-            if (hasUnsavedChanges) {
-                saveToLocalStorage();
-                e.preventDefault();
-                e.returnValue = 'Tiene cambios sin guardar. Se guardaron automáticamente.';
-                return e.returnValue;
-            }
+        // Guardar antes de cerrar
+        window.addEventListener('beforeunload', () => {
+            saveToLocalStorage();
         });
     </script>
 </body>
