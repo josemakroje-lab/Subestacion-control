@@ -97,7 +97,6 @@
             opacity: 0.9;
         }
 
-        /* Reubicación: user-info y connection-status juntos */
         .header-right {
             position: absolute;
             top: 15px;
@@ -374,31 +373,18 @@
             color: white;
         }
 
-        .btn-save {
-            background: #28a745;
-            color: white;
-            font-size: 1em;
-            padding: 10px 25px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
-        }
-
-        .btn-save:hover {
-            animation: none;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
-        }
-
         .btn-edit {
             background: #17a2b8;
             color: white;
             padding: 3px 8px;
             font-size: 0.8em;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            padding: 3px 8px;
+            font-size: 0.75em;
         }
 
         .btn-history {
@@ -413,9 +399,22 @@
             padding: 8px 15px;
         }
 
+        .btn-login-mode {
+            background: #28a745;
+            color: white;
+            padding: 8px 15px;
+            font-weight: bold;
+        }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
         .modal {
@@ -550,29 +549,6 @@
             font-size: 0.9em;
         }
 
-        .history-time {
-            color: #6c757d;
-            font-size: 0.8em;
-        }
-
-        .history-user {
-            color: #2a5298;
-            font-weight: bold;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            font-weight: bold;
-            margin-left: 5px;
-        }
-
-        .badge-success { background: #4CAF50; color: white; }
-        .badge-warning { background: #FFA726; color: white; }
-        .badge-danger { background: #EF5350; color: white; }
-
         .loading-overlay {
             display: none;
             position: fixed;
@@ -589,7 +565,6 @@
             color: #2a5298;
         }
 
-        /* Estilos para login */
         .modal-login {
             background: #f8f9fa;
             border-radius: 15px;
@@ -630,7 +605,6 @@
             background: #1e3c72;
         }
 
-        /* Estilos para hitos */
         .hitos-card {
             background: #f8f9fa;
             border: 2px solid #ffa726;
@@ -644,10 +618,22 @@
             margin-bottom: 10px;
         }
 
-        .hitos-list {
-            margin: 10px 0;
-            padding-left: 20px;
-            color: #555;
+        .hito-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hito-item p {
+            flex: 1;
+            min-width: 200px;
         }
 
         .hito-input {
@@ -658,6 +644,73 @@
             margin: 10px 0;
             resize: vertical;
             min-height: 80px;
+        }
+
+        .hitos-list {
+            margin: 10px 0;
+        }
+
+        .reporte-contenido {
+            display: none;
+            background: white;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+        }
+
+        .reporte-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #1e3c72;
+            padding-bottom: 15px;
+        }
+
+        .reporte-header h2 {
+            color: #1e3c72;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .reporte-header p {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .reporte-seccion {
+            margin-bottom: 25px;
+        }
+
+        .reporte-seccion h3 {
+            color: #2a5298;
+            border-left: 4px solid #2a5298;
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+
+        .reporte-tabla {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        .reporte-tabla th,
+        .reporte-tabla td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .reporte-tabla th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .reporte-firma {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
         }
 
         @media (max-width: 768px) {
@@ -703,14 +756,9 @@
         <div class="header">
             <div class="header-content">
                 <div class="logo-container">
-                    <img src="logo.jpeg"
-                         alt="Logo"
-                         class="logo-img"
-                         id="logo-img"
+                    <img src="logo.jpeg" alt="Logo" class="logo-img" id="logo-img"
                          onerror="this.style.display='none'; document.getElementById('logo-placeholder').style.display='flex';">
-                    <div id="logo-placeholder" class="logo-placeholder" style="display: none;">
-                        ⚡
-                    </div>
+                    <div id="logo-placeholder" class="logo-placeholder" style="display: none;">⚡</div>
                 </div>
                 <div class="header-text">
                     <h1>Subestación de Potencia</h1>
@@ -721,26 +769,18 @@
                 <div class="user-info" id="current-user-display">
                     👤 <span id="display-username">No identificado</span>
                 </div>
-                <div class="connection-status status-offline" id="connection-status">
-                    🔴 Sin conexión
-                </div>
+                <div class="connection-status status-offline" id="connection-status">🔴 Sin conexión</div>
             </div>
         </div>
 
         <div class="save-bar">
             <div class="save-info">
-                <button class="btn btn-save" onclick="saveChanges()" title="Guardar en la nube">
-                    ☁️ GUARDAR EN LA NUBE
-                </button>
-                <span class="unsaved-indicator" id="unsaved-indicator">
-                    ⚠️ Cambios sin guardar
-                </span>
+                <span class="unsaved-indicator" id="unsaved-indicator">⚠️ Cambios sin guardar</span>
             </div>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <span class="last-save" id="last-save-info">Último guardado: Nunca</span>
                 <button class="btn btn-history" onclick="showHistory()">📋 Historial</button>
-                <button class="btn btn-primary" onclick="changeUser()">👤 Cambiar Usuario</button>
-                <button class="btn btn-warning" onclick="syncNow()">🔄 Sincronizar</button>
+                <button class="btn btn-login-mode" id="btn-login-mode" onclick="showLoginModal()">🔓 Iniciar Sesión</button>
             </div>
         </div>
 
@@ -761,7 +801,7 @@
                 <div class="dashboard-grid">
                     <div class="card">
                         <h3>📈 Avance General</h3>
-                        <div class="progress-bar" onclick="editProgress('general', this)">
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 35%" data-value="35" id="progress-general">35%</div>
                         </div>
                         <div class="stat-number" id="stat-general">35%</div>
@@ -770,7 +810,7 @@
 
                     <div class="card">
                         <h3>🏗️ Obra Civil</h3>
-                        <div class="progress-bar" onclick="editProgress('civil-dashboard', this)">
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 65%" data-value="65" id="progress-civil-dashboard">65%</div>
                         </div>
                         <div class="stat-number" id="stat-civil-dashboard">65%</div>
@@ -779,7 +819,7 @@
 
                     <div class="card">
                         <h3>⚙️ Electromecánica</h3>
-                        <div class="progress-bar" onclick="editProgress('electromecanica-dashboard', this)">
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 15%" data-value="15" id="progress-electromecanica-dashboard">15%</div>
                         </div>
                         <div class="stat-number" id="stat-electromecanica-dashboard">15%</div>
@@ -788,7 +828,7 @@
 
                     <div class="card">
                         <h3>🔌 Puesta en Marcha</h3>
-                        <div class="progress-bar" onclick="editProgress('puesta-marcha-dashboard', this)">
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 0%" data-value="0" id="progress-puesta-marcha-dashboard">0%</div>
                         </div>
                         <div class="stat-number" id="stat-puesta-marcha-dashboard">0%</div>
@@ -801,136 +841,131 @@
                     <ul class="task-list">
                         <li class="task-item completed" data-id="1">
                             <span>✅ Excavación de zanjas para cables de potencia</span>
-                            <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">Completado</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-completed">Completado</span>
                         </li>
                         <li class="task-item completed" data-id="2">
                             <span>✅ Cimentación de transformador principal</span>
-                            <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">Completado</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-completed">Completado</span>
                         </li>
                         <li class="task-item in-progress" data-id="3">
                             <span>🔄 Montaje de estructuras metálicas</span>
-                            <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">En Progreso</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-in-progress">En Progreso</span>
                         </li>
                         <li class="task-item pending" data-id="4">
                             <span>⏳ Instalación de transformador 50 MVA</span>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-pending">Pendiente</span>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Hitos importantes -->
                 <div class="card hitos-card">
                     <h3>⚠️ Hitos Importantes por Atender</h3>
-                    <div id="hitos-mensaje">
+                    <div id="hitos-lista" class="hitos-list">
                         <p style="color: #6c757d;">Cargando hitos...</p>
                     </div>
-                    <textarea id="hito-input" class="hito-input" placeholder="Escribe un hito importante..."></textarea>
-                    <button class="btn btn-warning" onclick="guardarHito()">📝 Guardar Hito</button>
+                    <textarea id="hito-input" class="hito-input" placeholder="Escribe un hito importante..." disabled></textarea>
+                    <button class="btn btn-warning" id="btn-guardar-hito" onclick="guardarHito()" disabled>📝 Agregar Hito</button>
                 </div>
             </div>
 
             <!-- Obra Civil -->
             <div id="civil" class="tab-content">
                 <h2>🏗️ Seguimiento de Obra Civil</h2>
-                <button class="btn btn-primary" onclick="addNewActivity('civil')">+ Agregar Actividad</button>
+                <button class="btn btn-primary" onclick="addNewActivity('civil')" disabled>+ Agregar Actividad</button>
 
                 <div class="dashboard-grid" style="margin-top: 20px;">
                     <div class="card" data-section="movimiento-tierras">
-                        <h3>Movimiento de Tierras <button class="btn btn-edit" onclick="editSectionProgress(this)">✏️</button></h3>
-                        <div class="progress-bar" onclick="editProgress('movimiento-tierras', this)">
+                        <h3>Movimiento de Tierras <button class="btn btn-edit" onclick="editarSeccion(this)" disabled>✏️</button></h3>
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 90%" data-value="90">90%</div>
                         </div>
                         <ul class="task-list">
                             <li class="task-item completed" data-id="c1">
                                 <span>Excavación patio de maniobras</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-completed">100%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item completed" data-id="c2">
                                 <span>Nivelación de terreno</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-completed">100%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item in-progress" data-id="c3">
                                 <span>Compactación de suelo</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">75%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-in-progress">75%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                         </ul>
                     </div>
 
                     <div class="card" data-section="cimentaciones">
-                        <h3>Cimentaciones <button class="btn btn-edit" onclick="editSectionProgress(this)">✏️</button></h3>
-                        <div class="progress-bar" onclick="editProgress('cimentaciones', this)">
+                        <h3>Cimentaciones <button class="btn btn-edit" onclick="editarSeccion(this)" disabled>✏️</button></h3>
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 60%" data-value="60">60%</div>
                         </div>
                         <ul class="task-list">
                             <li class="task-item completed" data-id="c4">
                                 <span>Base transformador principal</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-completed">100%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item in-progress" data-id="c5">
                                 <span>Cimentación interruptores 230 kV</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">60%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-in-progress">60%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="c6">
                                 <span>Bases para seccionadores</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                         </ul>
                     </div>
 
                     <div class="card" data-section="estructuras">
-                        <h3>Estructuras y Edificaciones <button class="btn btn-edit" onclick="editSectionProgress(this)">✏️</button></h3>
-                        <div class="progress-bar" onclick="editProgress('estructuras', this)">
+                        <h3>Estructuras y Edificaciones <button class="btn btn-edit" onclick="editarSeccion(this)" disabled>✏️</button></h3>
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 45%" data-value="45">45%</div>
                         </div>
                         <ul class="task-list">
                             <li class="task-item completed" data-id="c7">
                                 <span>Caseta de control</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-completed">100%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item in-progress" data-id="c8">
                                 <span>Estructuras soporte barras 230 kV</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">30%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-in-progress">30%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="c9">
                                 <span>Cerco perimetral</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                         </ul>
                     </div>
 
                     <div class="card" data-section="drenajes">
-                        <h3>Sistema de Drenajes <button class="btn btn-edit" onclick="editSectionProgress(this)">✏️</button></h3>
-                        <div class="progress-bar" onclick="editProgress('drenajes', this)">
+                        <h3>Sistema de Drenajes <button class="btn btn-edit" onclick="editarSeccion(this)" disabled>✏️</button></h3>
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 25%" data-value="25">25%</div>
                         </div>
                         <ul class="task-list">
                             <li class="task-item in-progress" data-id="c10">
                                 <span>Canaletas de cables</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">40%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-in-progress">40%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="c11">
                                 <span>Drenaje de aguas pluviales</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">10%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">10%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="c12">
                                 <span>Fosa de aceite</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                         </ul>
                     </div>
@@ -940,77 +975,77 @@
             <!-- Electromecánica -->
             <div id="electromecanica" class="tab-content">
                 <h2>⚙️ Montaje Electromecánico</h2>
-                <button class="btn btn-primary" onclick="addNewActivity('electromecanica')">+ Agregar Actividad</button>
+                <button class="btn btn-primary" onclick="addNewActivity('electromecanica')" disabled>+ Agregar Actividad</button>
 
                 <div class="dashboard-grid" style="margin-top: 20px;">
                     <div class="card" data-section="transformador">
-                        <h3>Transformador de Potencia 50 MVA <button class="btn btn-edit" onclick="editSectionProgress(this)">✏️</button></h3>
-                        <div class="progress-bar" onclick="editProgress('transformador', this)">
+                        <h3>Transformador de Potencia 50 MVA <button class="btn btn-edit" onclick="editarSeccion(this)" disabled>✏️</button></h3>
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 10%" data-value="10">10%</div>
                         </div>
                         <ul class="task-list">
                             <li class="task-item in-progress" data-id="e1">
                                 <span>Preparación de base</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">30%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-in-progress">30%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="e2">
                                 <span>Transporte y descarga</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="e3">
                                 <span>Montaje de accesorios</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                         </ul>
                     </div>
 
                     <div class="card" data-section="alta-tension">
-                        <h3>Equipos de Alta Tensión 230 kV <button class="btn btn-edit" onclick="editSectionProgress(this)">✏️</button></h3>
-                        <div class="progress-bar" onclick="editProgress('alta-tension', this)">
+                        <h3>Equipos de Alta Tensión 230 kV <button class="btn btn-edit" onclick="editarSeccion(this)" disabled>✏️</button></h3>
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 5%" data-value="5">5%</div>
                         </div>
                         <ul class="task-list">
                             <li class="task-item pending" data-id="e4">
                                 <span>Interruptores SF6</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="e5">
                                 <span>Seccionadores tripolares</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="e6">
                                 <span>Transformadores de corriente</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                         </ul>
                     </div>
 
                     <div class="card" data-section="tableros">
-                        <h3>Tableros y Sistemas Auxiliares <button class="btn btn-edit" onclick="editSectionProgress(this)">✏️</button></h3>
-                        <div class="progress-bar" onclick="editProgress('tableros', this)">
+                        <h3>Tableros y Sistemas Auxiliares <button class="btn btn-edit" onclick="editarSeccion(this)" disabled>✏️</button></h3>
+                        <div class="progress-bar">
                             <div class="progress-fill" style="width: 20%" data-value="20">20%</div>
                         </div>
                         <ul class="task-list">
                             <li class="task-item completed" data-id="e7">
                                 <span>Tableros de control</span>
-                                <span class="status-badge status-completed" onclick="cycleStatus(this); markAsChanged()">100%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-completed">100%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item in-progress" data-id="e8">
                                 <span>Banco de baterías 125 VCC</span>
-                                <span class="status-badge status-in-progress" onclick="cycleStatus(this); markAsChanged()">50%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-in-progress">50%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                             <li class="task-item pending" data-id="e9">
                                 <span>Sistema contra incendios</span>
-                                <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">0%</span>
-                                <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
+                                <span class="status-badge status-pending">0%</span>
+                                <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                             </li>
                         </ul>
                     </div>
@@ -1020,7 +1055,7 @@
             <!-- Puesta en Marcha -->
             <div id="puesta-marcha" class="tab-content">
                 <h2>🔌 Puesta en Marcha y Comisionamiento</h2>
-                <button class="btn btn-primary" onclick="addNewActivity('puesta-marcha')">+ Agregar Prueba</button>
+                <button class="btn btn-primary" onclick="addNewActivity('puesta-marcha')" disabled>+ Agregar Prueba</button>
 
                 <div class="card" style="margin-top: 20px;">
                     <h3>Plan de Pruebas y Comisionamiento</h3>
@@ -1028,32 +1063,32 @@
                         <div class="timeline-item" data-id="p1">
                             <h4>Fase 1: Pruebas en Fábrica</h4>
                             <p>Transformador, interruptores, seccionadores - FAT</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-pending">Pendiente</span>
+                            <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                         </div>
                         <div class="timeline-item" data-id="p2">
                             <h4>Fase 2: Pruebas de Recepción en Sitio</h4>
                             <p>Verificación de equipos, inspección visual, pruebas mecánicas</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-pending">Pendiente</span>
+                            <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                         </div>
                         <div class="timeline-item" data-id="p3">
                             <h4>Fase 3: Pruebas de Aislamiento</h4>
                             <p>Rigidez dieléctrica, factor de potencia, resistencia de aislamiento</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-pending">Pendiente</span>
+                            <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                         </div>
                         <div class="timeline-item" data-id="p4">
                             <h4>Fase 4: Pruebas Funcionales</h4>
                             <p>Sistemas de control, protecciones, comunicaciones</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-pending">Pendiente</span>
+                            <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                         </div>
                         <div class="timeline-item" data-id="p5">
                             <h4>Fase 5: Energización Progresiva</h4>
                             <p>Pruebas en vacío, con carga, sincronización</p>
-                            <span class="status-badge status-pending" onclick="cycleStatus(this); markAsChanged()">Pendiente</span>
-                            <button class="btn btn-edit" onclick="editTask(this)">✏️</button>
+                            <span class="status-badge status-pending">Pendiente</span>
+                            <button class="btn btn-edit" onclick="editarTarea(this)" disabled>✏️</button>
                         </div>
                     </div>
                 </div>
@@ -1061,102 +1096,18 @@
         </div>
     </div>
 
-    <!-- Modales -->
-    <div id="modal-progress" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('modal-progress')">&times;</span>
-            <h2>Editar Porcentaje de Avance</h2>
-            <form id="form-progress" onsubmit="saveProgress(event)">
-                <div class="form-group">
-                    <label>Sección: <strong id="modal-section-name"></strong></label>
-                </div>
-                <div class="form-group">
-                    <label>Nuevo Porcentaje (%)</label>
-                    <input type="range" id="progress-slider" min="0" max="100" value="50"
-                           oninput="document.getElementById('progress-value').textContent = this.value + '%'"
-                           style="width: 100%;">
-                    <div style="text-align: center; font-size: 2em; font-weight: bold; color: #2a5298;" id="progress-value">50%</div>
-                </div>
-                <button type="submit" class="btn btn-success" style="width: 100%;">✅ Guardar Cambios</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-task" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('modal-task')">&times;</span>
-            <h2>Editar Tarea</h2>
-            <form id="form-task" onsubmit="saveTask(event)">
-                <div class="form-group">
-                    <label>Nombre de la Tarea</label>
-                    <input type="text" id="task-name" required>
-                </div>
-                <div class="form-group">
-                    <label>Porcentaje (%)</label>
-                    <input type="number" id="task-percentage" min="0" max="100" required>
-                </div>
-                <div class="form-group">
-                    <label>Estado</label>
-                    <select id="task-status">
-                        <option value="completed">Completado</option>
-                        <option value="in-progress">En Progreso</option>
-                        <option value="pending">Pendiente</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-success" style="width: 100%;">✅ Guardar Cambios</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modal-save" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('modal-save')">&times;</span>
-            <h2>☁️ Guardar en la Nube</h2>
-            <p style="color: #6c757d; margin-bottom: 15px;">Los cambios se guardarán y estarán disponibles en todos los dispositivos.</p>
-            <div class="form-group">
-                <label>👤 Nombre de quien modifica *</label>
-                <input type="text" id="save-username" placeholder="Ingrese su nombre completo" required>
-            </div>
-            <div class="form-group">
-                <label>📝 Comentario (opcional)</label>
-                <textarea id="save-comment" rows="3" placeholder="Describa los cambios realizados..."></textarea>
-            </div>
-            <button onclick="confirmSave()" class="btn btn-save" style="width: 100%;">☁️ Guardar en la Nube</button>
-        </div>
-    </div>
-
-    <div id="modal-user" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('modal-user')">&times;</span>
-            <h2>👤 Cambiar Usuario Actual</h2>
-            <div class="form-group">
-                <label>Nombre del usuario</label>
-                <input type="text" id="change-username" placeholder="Ingrese su nombre" required>
-            </div>
-            <button onclick="changeUserConfirm()" class="btn btn-primary" style="width: 100%;">✅ Establecer Usuario</button>
-        </div>
-    </div>
-
-    <div id="modal-history" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <span class="close" onclick="closeModal('modal-history')">&times;</span>
-            <h2>📋 Historial de Modificaciones</h2>
-            <div class="history-list" id="history-list">
-                <p style="color: #6c757d;">Cargando historial...</p>
-            </div>
-            <button onclick="clearHistory()" class="btn btn-danger" style="margin-top: 15px;">🗑️ Limpiar Historial</button>
-        </div>
-    </div>
+    <!-- Contenedor oculto para el reporte PDF -->
+    <div id="reporte-contenido" class="reporte-contenido"></div>
 
     <!-- Modal de Login -->
     <div id="modal-login" class="modal">
         <div class="modal-content modal-login">
             <span class="close" onclick="closeModal('modal-login')">&times;</span>
-            <h2>🔒 Acceso de administrador</h2>
-            <p style="color: #6c757d; margin-bottom: 15px;">Se requieren credenciales para modificar.</p>
-            <input type="text" id="login-username" placeholder="Usuario" value="admin">
+            <h2>🔐 Autenticación de Usuario</h2>
+            <p style="color: #6c757d; margin-bottom: 15px;">Ingrese sus credenciales para editar</p>
+            <input type="text" id="login-username" placeholder="Usuario">
             <input type="password" id="login-password" placeholder="Contraseña">
-            <button class="btn-login" onclick="loginAdmin()">Ingresar</button>
+            <button class="btn-login" onclick="loginUser()">Ingresar</button>
             <p id="login-error" style="color: red; display: none;">Credenciales incorrectas</p>
         </div>
     </div>
@@ -1184,38 +1135,36 @@
             .catch((err) => console.warn('⚠️ Soporte offline limitado:', err));
 
         // ═══════════════════════════════════════════
+        // USUARIOS AUTORIZADOS
+        // ═══════════════════════════════════════════
+        const usuariosAutorizados = {
+            'admin': { password: 'Makro@2026', nombre: 'Administrador' },
+            'Jose Escarrega': { password: 'Jose@2026', nombre: 'Jose Escarrega' }
+        };
+
+        // ═══════════════════════════════════════════
         // VARIABLES GLOBALES
         // ═══════════════════════════════════════════
-        let currentUser = localStorage.getItem('currentUser') || '';
+        let currentUser = '';
+        let isAuthenticated = false;
         let hasUnsavedChanges = false;
-        let modificationHistory = [];
         let lastSaveTime = localStorage.getItem('lastSaveTime') || null;
-        let currentProgressBar = null;
-        let currentSection = null;
-        let currentTaskElement = null;
-        let isOnline = false;
-        let lastCloudUpdate = null;
-        let isAdmin = false;
-        let pendingAction = null;
+        let hitosActuales = [];
 
         // ═══════════════════════════════════════════
         // INICIALIZACIÓN
         // ═══════════════════════════════════════════
         window.addEventListener('load', () => {
+            updateConnectionStatus();
             updateUserDisplay();
             updateLastSaveDisplay();
-            updateConnectionStatus();
+            updateEditModeUI();
             loadFromCloud();
             listenForChanges();
             cargarHitos();
 
-            if (!currentUser) {
-                setTimeout(() => changeUser(), 1000);
-            }
-
             console.log('✅ Sistema conectado a Firebase');
-            console.log('📊 Proyecto: subestacion-control');
-            console.log('☁️ Datos se sincronizan en todos los dispositivos');
+            console.log('🔐 Usuarios autorizados: admin, Jose Escarrega');
         });
 
         function updateConnectionStatus() {
@@ -1223,27 +1172,31 @@
             if (navigator.onLine) {
                 statusEl.textContent = '🟢 En línea - Nube';
                 statusEl.className = 'connection-status status-online';
-                isOnline = true;
             } else {
                 statusEl.textContent = '🔴 Sin conexión';
                 statusEl.className = 'connection-status status-offline';
-                isOnline = false;
             }
         }
 
         window.addEventListener('online', () => {
             updateConnectionStatus();
-            showNotification('✅ Conexión restablecida - Sincronizando...');
-            syncNow();
+            showNotification('✅ Conexión restablecida');
+            loadFromCloud();
+            cargarHitos();
         });
 
         window.addEventListener('offline', () => {
             updateConnectionStatus();
-            showNotification('⚠️ Sin conexión - Los cambios se guardarán localmente');
+            showNotification('⚠️ Sin conexión');
         });
 
         function updateUserDisplay() {
-            document.getElementById('display-username').textContent = currentUser || 'No identificado';
+            const display = document.getElementById('display-username');
+            if (isAuthenticated && currentUser) {
+                display.textContent = currentUser;
+            } else {
+                display.textContent = 'No autenticado';
+            }
         }
 
         function updateLastSaveDisplay() {
@@ -1258,15 +1211,588 @@
             hasUnsavedChanges = true;
             document.getElementById('unsaved-indicator').style.display = 'inline';
             updateDashboardFromTasks();
+            guardarEnNube('Cambios automáticos');
         }
 
+        function clearUnsavedIndicator() {
+            hasUnsavedChanges = false;
+            document.getElementById('unsaved-indicator').style.display = 'none';
+        }
+
+        function updateEditModeUI() {
+            const isEditMode = isAuthenticated;
+
+            // Botones de edición
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.disabled = !isEditMode;
+                if (isEditMode) {
+                    btn.classList.remove('btn-disabled');
+                    btn.style.display = 'inline-block';
+                } else {
+                    btn.classList.add('btn-disabled');
+                }
+            });
+
+            // Botones de agregar actividad
+            document.querySelectorAll('button[onclick*="addNewActivity"]').forEach(btn => {
+                btn.disabled = !isEditMode;
+            });
+
+            // Hitos
+            const hitoInput = document.getElementById('hito-input');
+            const btnHito = document.getElementById('btn-guardar-hito');
+            if (hitoInput) hitoInput.disabled = !isEditMode;
+            if (btnHito) btnHito.disabled = !isEditMode;
+
+            // Botón de login/logout
+            const btnLogin = document.getElementById('btn-login-mode');
+            if (isAuthenticated) {
+                btnLogin.textContent = '🔒 Cerrar Sesión (' + currentUser + ')';
+                btnLogin.className = 'btn btn-danger';
+                btnLogin.onclick = logout;
+            } else {
+                btnLogin.textContent = '🔓 Iniciar Sesión';
+                btnLogin.className = 'btn btn-login-mode';
+                btnLogin.onclick = showLoginModal;
+            }
+
+            // Actualizar botones de borrar hitos
+            updateHitosDeleteButtons();
+        }
+
+        // ═══════════════════════════════════════════
+        // AUTENTICACIÓN
+        // ═══════════════════════════════════════════
+        function showLoginModal() {
+            if (isAuthenticated) {
+                logout();
+                return;
+            }
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('modal-login').style.display = 'block';
+        }
+
+        function loginUser() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            const usuario = usuariosAutorizados[username];
+
+            if (usuario && usuario.password === password) {
+                isAuthenticated = true;
+                currentUser = usuario.nombre;
+                closeModal('modal-login');
+                updateUserDisplay();
+                updateEditModeUI();
+                showNotification('✅ Bienvenido: ' + currentUser);
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('login-error').textContent = 'Credenciales incorrectas';
+                setTimeout(() => {
+                    document.getElementById('login-error').style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function logout() {
+            isAuthenticated = false;
+            currentUser = '';
+            updateUserDisplay();
+            updateEditModeUI();
+            showNotification('🔒 Sesión cerrada');
+        }
+
+        function requireAuth() {
+            if (isAuthenticated) return true;
+            showLoginModal();
+            return false;
+        }
+
+        // ═══════════════════════════════════════════
+        // HITOS IMPORTANTES (con borrado)
+        // ═══════════════════════════════════════════
+        function cargarHitos() {
+            db.collection("hitos").get()
+                .then((snapshot) => {
+                    hitosActuales = [];
+                    snapshot.forEach((doc) => {
+                        hitosActuales.push({
+                            id: doc.id,
+                            mensaje: doc.data().mensaje,
+                            fecha: doc.data().fecha?.toDate() || new Date()
+                        });
+                    });
+                    // Ordenar por fecha descendente
+                    hitosActuales.sort((a, b) => b.fecha - a.fecha);
+                    renderHitos();
+                })
+                .catch((error) => {
+                    console.error('Error al cargar hitos:', error);
+                    document.getElementById('hitos-lista').innerHTML = 
+                        '<p style="color: #EF5350;">Error al cargar hitos</p>';
+                });
+        }
+
+        function renderHitos() {
+            const contenedor = document.getElementById('hitos-lista');
+            
+            if (hitosActuales.length === 0) {
+                contenedor.innerHTML = '<p style="color: #6c757d;">No hay hitos pendientes</p>';
+                return;
+            }
+
+            let html = '';
+            hitosActuales.forEach((hito) => {
+                const fecha = hito.fecha.toLocaleDateString('es-MX');
+                html += `
+                    <div class="hito-item" data-hito-id="${hito.id}">
+                        <p>📌 ${hito.mensaje}</p>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <span style="font-size: 0.75em; color: #6c757d;">${fecha}</span>
+                            ${isAuthenticated ? `<button class="btn btn-delete" onclick="borrarHito('${hito.id}')">🗑️ Borrar</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            contenedor.innerHTML = html;
+        }
+
+        function guardarHito() {
+            if (!requireAuth()) return;
+
+            const mensaje = document.getElementById('hito-input').value.trim();
+            if (!mensaje) {
+                showNotification('⚠️ Escribe un mensaje', 'error');
+                return;
+            }
+
+            db.collection("hitos").add({
+                mensaje: mensaje,
+                fecha: firebase.firestore.FieldValue.serverTimestamp(),
+                usuario: currentUser
+            })
+            .then(() => {
+                showNotification('✅ Hito agregado');
+                document.getElementById('hito-input').value = '';
+                cargarHitos();
+            })
+            .catch((error) => {
+                console.error('Error al guardar hito:', error);
+                showNotification('⚠️ Error al guardar hito', 'error');
+            });
+        }
+
+        function borrarHito(hitoId) {
+            if (!requireAuth()) return;
+
+            if (!confirm('¿Está seguro de borrar este hito?')) return;
+
+            db.collection("hitos").doc(hitoId).delete()
+                .then(() => {
+                    showNotification('🗑️ Hito borrado');
+                    cargarHitos();
+                })
+                .catch((error) => {
+                    console.error('Error al borrar hito:', error);
+                    showNotification('⚠️ Error al borrar hito', 'error');
+                });
+        }
+
+        function updateHitosDeleteButtons() {
+            const contenedor = document.getElementById('hitos-lista');
+            if (!contenedor) return;
+
+            const deleteButtons = contenedor.querySelectorAll('.btn-delete');
+            deleteButtons.forEach(btn => {
+                if (isAuthenticated) {
+                    btn.style.display = 'inline-block';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        // FUNCIONES DE EDICIÓN
+        // ═══════════════════════════════════════════
+        function editarTarea(button) {
+            if (!requireAuth()) return;
+            const taskElement = button.closest('.task-item') || button.closest('.timeline-item');
+            if (!taskElement) return;
+
+            const nombreActual = taskElement.querySelector('span:first-child, h4').textContent;
+            const badge = taskElement.querySelector('.status-badge');
+            const porcentajeActual = parseInt(badge.textContent) || 0;
+
+            const nuevoNombre = prompt('Nombre de la tarea:', nombreActual);
+            if (!nuevoNombre) return;
+
+            const nuevoPorcentaje = prompt('Porcentaje (0-100):', porcentajeActual);
+            if (nuevoPorcentaje === null) return;
+
+            const porc = parseInt(nuevoPorcentaje);
+            if (isNaN(porc) || porc < 0 || porc > 100) {
+                showNotification('⚠️ Porcentaje inválido', 'error');
+                return;
+            }
+
+            const nameSpan = taskElement.querySelector('span:first-child, h4');
+            if (nameSpan) nameSpan.textContent = nuevoNombre;
+
+            badge.textContent = porc + '%';
+            badge.className = 'status-badge ' + (porc >= 100 ? 'status-completed' : porc > 0 ? 'status-in-progress' : 'status-pending');
+
+            if (taskElement.classList.contains('task-item')) {
+                taskElement.className = 'task-item ' + (porc >= 100 ? 'completed' : porc > 0 ? 'in-progress' : 'pending');
+            }
+
+            updateAllProgressBars();
+            markAsChanged();
+            showNotification('✅ Tarea actualizada');
+        }
+
+        function editarSeccion(button) {
+            if (!requireAuth()) return;
+            const card = button.closest('.card');
+            const bar = card.querySelector('.progress-fill');
+            const nombre = card.querySelector('h3').textContent.trim();
+
+            const nuevoValor = prompt('Nuevo porcentaje para ' + nombre + ' (0-100):', bar.dataset.value);
+            if (nuevoValor === null) return;
+
+            const valor = parseInt(nuevoValor);
+            if (isNaN(valor) || valor < 0 || valor > 100) {
+                showNotification('⚠️ Valor inválido', 'error');
+                return;
+            }
+
+            bar.style.width = valor + '%';
+            bar.textContent = valor + '%';
+            bar.dataset.value = valor;
+
+            updateAllProgressBars();
+            markAsChanged();
+            showNotification('✅ Sección actualizada');
+        }
+
+        function addNewActivity(type) {
+            if (!requireAuth()) return;
+
+            const nombre = prompt('Nombre de la nueva actividad:');
+            if (!nombre) return;
+
+            const seccion = prompt('Sección (movimiento-tierras, cimentaciones, estructuras, drenajes, transformador, alta-tension, tableros):');
+            if (!seccion) return;
+
+            const card = document.querySelector(`.card[data-section="${seccion}"]`);
+            if (!card) {
+                showNotification('⚠️ Sección no encontrada', 'error');
+                return;
+            }
+
+            const taskList = card.querySelector('.task-list');
+            const newTask = document.createElement('li');
+            newTask.className = 'task-item pending';
+            newTask.dataset.id = 'new_' + Date.now();
+            newTask.innerHTML = `
+                <span>${nombre}</span>
+                <span class="status-badge status-pending">0%</span>
+                <button class="btn btn-edit" onclick="editarTarea(this)">✏️</button>
+            `;
+            taskList.appendChild(newTask);
+
+            updateAllProgressBars();
+            markAsChanged();
+            showNotification('✅ Actividad agregada');
+        }
+
+        // ═══════════════════════════════════════════
+        // FUNCIONES DE FIREBASE
+        // ═══════════════════════════════════════════
+        function loadFromCloud() {
+            showLoading();
+            db.collection("estadoActual").doc("subestacion")
+                .get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const cloudData = doc.data();
+                        restoreData(cloudData.data);
+                        lastSaveTime = cloudData.ultimaModificacion?.toDate()?.toISOString();
+                        updateLastSaveDisplay();
+                    }
+                    hideLoading();
+                })
+                .catch(() => {
+                    hideLoading();
+                    showNotification('⚠️ Usando datos locales', 'error');
+                });
+        }
+
+        function listenForChanges() {
+            db.collection("estadoActual").doc("subestacion")
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const cloudData = doc.data();
+                        if (cloudData.ultimoUsuario !== currentUser) {
+                            restoreData(cloudData.data);
+                            showNotification('📲 Datos actualizados por ' + (cloudData.ultimoUsuario || 'otro usuario'));
+                        }
+                    }
+                });
+        }
+
+        function guardarEnNube(comentario = '') {
+            if (!isAuthenticated) return;
+
+            const data = getAllCurrentData();
+
+            db.collection("estadoActual").doc("subestacion").set({
+                data: data,
+                ultimoUsuario: currentUser,
+                ultimaModificacion: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                return db.collection("historialModificaciones").add({
+                    usuario: currentUser,
+                    comentario: comentario,
+                    fecha: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            })
+            .then(() => {
+                lastSaveTime = new Date().toISOString();
+                localStorage.setItem('lastSaveTime', lastSaveTime);
+                clearUnsavedIndicator();
+                updateLastSaveDisplay();
+                console.log('✅ Guardado en la nube por:', currentUser);
+            })
+            .catch((error) => {
+                console.error('Error al guardar:', error);
+                showNotification('⚠️ Error al guardar en la nube', 'error');
+            });
+        }
+
+        function restoreData(data) {
+            if (!data) return;
+
+            if (data.progress) {
+                Object.entries(data.progress).forEach(([section, info]) => {
+                    let bar = document.querySelector(`.card[data-section="${section}"] .progress-fill`);
+                    if (!bar) bar = document.getElementById('progress-' + section);
+                    if (bar) {
+                        bar.style.width = info.value + '%';
+                        bar.textContent = info.value + '%';
+                        bar.dataset.value = info.value;
+                    }
+                });
+            }
+
+            if (data.tasks) {
+                data.tasks.forEach(savedTask => {
+                    const taskElement = document.querySelector(`.task-item[data-id="${savedTask.id}"]`);
+                    if (taskElement) {
+                        const nameSpan = taskElement.querySelector('span:first-child');
+                        if (nameSpan) nameSpan.textContent = savedTask.name;
+                        const badge = taskElement.querySelector('.status-badge');
+                        if (badge) {
+                            badge.textContent = savedTask.percentage;
+                            badge.className = 'status-badge status-' + savedTask.status;
+                        }
+                        taskElement.className = 'task-item ' + savedTask.status;
+                    }
+                });
+            }
+
+            updateAllProgressBars();
+            updateDashboardFromTasks();
+        }
+
+        function getAllCurrentData() {
+            const data = { progress: {}, tasks: [] };
+
+            document.querySelectorAll('.progress-fill[data-value]').forEach(bar => {
+                const card = bar.closest('.card');
+                const section = card?.dataset?.section || bar.id || 'general';
+                data.progress[section] = { value: bar.dataset.value, text: bar.textContent };
+            });
+
+            document.querySelectorAll('.task-item[data-id]').forEach(task => {
+                const badge = task.querySelector('.status-badge');
+                const nameSpan = task.querySelector('span:first-child');
+                data.tasks.push({
+                    id: task.dataset.id,
+                    name: nameSpan ? nameSpan.textContent : '',
+                    percentage: badge ? badge.textContent : '0%',
+                    status: task.className.includes('completed') ? 'completed' :
+                            task.className.includes('in-progress') ? 'in-progress' : 'pending'
+                });
+            });
+
+            return data;
+        }
+
+        // ═══════════════════════════════════════════
+        // DASHBOARD AUTOMÁTICO
+        // ═══════════════════════════════════════════
+        function updateDashboardFromTasks() {
+            const civilAvg = calculateAverageProgress(['movimiento-tierras', 'cimentaciones', 'estructuras', 'drenajes']);
+            updateDashboardCard('civil-dashboard', civilAvg);
+
+            const elecAvg = calculateAverageProgress(['transformador', 'alta-tension', 'tableros']);
+            updateDashboardCard('electromecanica-dashboard', elecAvg);
+
+            const pmAvg = calculatePuestaMarchaProgress();
+            updateDashboardCard('puesta-marcha-dashboard', pmAvg);
+
+            const generalAvg = Math.round((civilAvg + elecAvg + pmAvg) / 3);
+            updateDashboardCard('general', generalAvg);
+        }
+
+        function calculateAverageProgress(sections) {
+            let total = 0, count = 0;
+            sections.forEach(section => {
+                const card = document.querySelector(`.card[data-section="${section}"]`);
+                if (card) {
+                    const badges = card.querySelectorAll('.status-badge');
+                    if (badges.length > 0) {
+                        let st = 0;
+                        badges.forEach(b => st += parseInt(b.textContent) || 0);
+                        total += Math.round(st / badges.length);
+                        count++;
+                    }
+                }
+            });
+            return count > 0 ? Math.round(total / count) : 0;
+        }
+
+        function calculatePuestaMarchaProgress() {
+            const items = document.querySelectorAll('#puesta-marcha .timeline-item');
+            if (items.length === 0) return 0;
+            let total = 0;
+            items.forEach(item => {
+                const badge = item.querySelector('.status-badge');
+                if (badge) {
+                    if (badge.textContent.includes('100')) total += 100;
+                    else if (badge.textContent.includes('50')) total += 50;
+                }
+            });
+            return Math.round(total / items.length);
+        }
+
+        function updateDashboardCard(section, value) {
+            const bar = document.getElementById('progress-' + section);
+            const stat = document.getElementById('stat-' + section);
+            if (bar) {
+                bar.style.width = value + '%';
+                bar.textContent = value + '%';
+                bar.dataset.value = value;
+            }
+            if (stat) stat.textContent = value + '%';
+        }
+
+        function updateAllProgressBars() {
+            document.querySelectorAll('.card[data-section]').forEach(card => {
+                const badges = card.querySelectorAll('.status-badge');
+                if (badges.length === 0) return;
+                let total = 0;
+                badges.forEach(b => total += parseInt(b.textContent) || 0);
+                const avg = Math.round(total / badges.length);
+                const bar = card.querySelector('.progress-fill');
+                if (bar) {
+                    bar.style.width = avg + '%';
+                    bar.textContent = avg + '%';
+                    bar.dataset.value = avg;
+                }
+            });
+            updateDashboardFromTasks();
+        }
+
+        // ═══════════════════════════════════════════
+        // GENERAR PDF
+        // ═══════════════════════════════════════════
+        function generarPDF() {
+            const data = getAllCurrentData();
+            const civilAvg = calculateAverageProgress(['movimiento-tierras', 'cimentaciones', 'estructuras', 'drenajes']);
+            const elecAvg = calculateAverageProgress(['transformador', 'alta-tension', 'tableros']);
+            const pmAvg = calculatePuestaMarchaProgress();
+            const generalAvg = Math.round((civilAvg + elecAvg + pmAvg) / 3);
+
+            const fechaActual = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            let hitosHTML = '<p>No hay hitos registrados.</p>';
+            if (hitosActuales.length > 0) {
+                hitosHTML = hitosActuales.map(h => `<div class="reporte-hito">📌 ${h.mensaje}</div>`).join('');
+            }
+
+            const reporteHTML = `
+                <div class="reporte-header">
+                    <h2>Reporte de Avance - Subestación 50 MVA</h2>
+                    <p>230 kV / 13.8 kV</p>
+                    <p>Fecha: ${fechaActual}</p>
+                </div>
+                <div class="reporte-seccion">
+                    <h3>Resumen de Avances</h3>
+                    <table class="reporte-tabla">
+                        <thead><tr><th>Área</th><th>Porcentaje</th></tr></thead>
+                        <tbody>
+                            <tr><td>Obra Civil</td><td>${civilAvg}%</td></tr>
+                            <tr><td>Electromecánica</td><td>${elecAvg}%</td></tr>
+                            <tr><td>Puesta en Marcha</td><td>${pmAvg}%</td></tr>
+                            <tr><td><strong>Avance General</strong></td><td><strong>${generalAvg}%</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="reporte-seccion">
+                    <h3>Hitos Importantes</h3>
+                    ${hitosHTML}
+                </div>
+                <div class="reporte-seccion">
+                    <h3>Estado de Actividades</h3>
+                    <table class="reporte-tabla">
+                        <thead><tr><th>Actividad</th><th>Estado</th><th>Avance</th></tr></thead>
+                        <tbody>
+                            ${data.tasks.map(t => `
+                                <tr>
+                                    <td>${t.name}</td>
+                                    <td>${t.status === 'completed' ? 'Completado' : t.status === 'in-progress' ? 'En Progreso' : 'Pendiente'}</td>
+                                    <td>${t.percentage}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="reporte-firma">
+                    <p>Documento generado automáticamente por el Sistema de Control y Seguimiento</p>
+                </div>
+            `;
+
+            const contenedor = document.getElementById('reporte-contenido');
+            contenedor.innerHTML = reporteHTML;
+            contenedor.style.display = 'block';
+
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: 'reporte_avance_subestacion.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(contenedor).save().then(() => {
+                contenedor.style.display = 'none';
+            });
+        }
+
+        // ═══════════════════════════════════════════
+        // UTILIDADES
+        // ═══════════════════════════════════════════
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
 
             document.getElementById(tabName).classList.add('active');
-
-            if (tabName === 'dashboard') updateDashboardFromTasks();
 
             const tabMap = {
                 'dashboard': 'Dashboard',
@@ -1297,693 +1823,9 @@
             document.getElementById('loading-overlay').style.display = 'none';
         }
 
-        // ═══════════════════════════════════════════
-        // AUTENTICACIÓN
-        // ═══════════════════════════════════════════
-        function requireAdmin(callback) {
-            if (isAdmin) {
-                if (callback) callback();
-                return true;
-            }
-            pendingAction = callback;
-            document.getElementById('modal-login').style.display = 'block';
-            return false;
-        }
-
-        function loginAdmin() {
-            const username = document.getElementById('login-username').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            if (username === 'admin' && password === 'Makro@2026') {
-                isAdmin = true;
-                closeModal('modal-login');
-                showNotification('✅ Sesión iniciada como admin');
-                if (pendingAction) {
-                    pendingAction();
-                    pendingAction = null;
-                }
-            } else {
-                document.getElementById('login-error').style.display = 'block';
-                setTimeout(() => document.getElementById('login-error').style.display = 'none', 3000);
-            }
-        }
-
-        // ═══════════════════════════════════════════
-        // HITOS IMPORTANTES
-        // ═══════════════════════════════════════════
-        function cargarHitos() {
-            db.collection("hitos").doc("importante").get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        document.getElementById('hitos-mensaje').innerHTML =
-                            `<p>${data.mensaje || 'No hay hitos pendientes'}</p>`;
-                    } else {
-                        document.getElementById('hitos-mensaje').innerHTML =
-                            '<p style="color: #6c757d;">No hay hitos pendientes</p>';
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('hitos-mensaje').innerHTML =
-                        '<p style="color: #EF5350;">Error al cargar hitos</p>';
-                });
-        }
-
-        function guardarHito() {
-            if (!requireAdmin(() => guardarHito())) return;
-
-            const mensaje = document.getElementById('hito-input').value.trim();
-            if (!mensaje) {
-                showNotification('⚠️ Escribe un mensaje para el hito', 'error');
-                return;
-            }
-
-            db.collection("hitos").doc("importante").set({
-                mensaje: mensaje,
-                ultimaModificacion: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                showNotification('✅ Hito guardado');
-                document.getElementById('hito-input').value = '';
-                cargarHitos();
-            })
-            .catch(() => showNotification('⚠️ Error al guardar', 'error'));
-        }
-
-        // ═══════════════════════════════════════════
-        // GENERAR PDF
-        // ═══════════════════════════════════════════
-        function generarPDF() {
-            const element = document.getElementById('dashboard');
-            if (!element) return;
-
-            const opt = {
-                margin: [10, 10, 10, 10],
-                filename: 'dashboard_subestacion.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-            };
-
-            html2pdf().set(opt).from(element).save();
-        }
-
-        // ═══════════════════════════════════════════
-        // FUNCIONES DE FIREBASE (carga/guardado)
-        // ═══════════════════════════════════════════
-        function loadFromCloud() {
-            showLoading();
-            console.log('☁️ Cargando datos desde Firebase...');
-
-            db.collection("estadoActual").doc("subestacion")
-                .get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        const cloudData = doc.data();
-                        lastCloudUpdate = cloudData.ultimaModificacion?.toDate();
-                        restoreData(cloudData.data);
-                        updateLastSaveDisplay();
-                    } else {
-                        console.log('📦 No hay datos en la nube - Usando valores predeterminados');
-                    }
-                    hideLoading();
-                })
-                .catch((error) => {
-                    console.error('❌ Error al cargar:', error);
-                    showNotification('⚠️ Usando datos locales', 'error');
-                    loadLocalFallback();
-                    hideLoading();
-                });
-        }
-
-        function listenForChanges() {
-            db.collection("estadoActual").doc("subestacion")
-                .onSnapshot((doc) => {
-                    if (doc.exists) {
-                        const cloudData = doc.data();
-                        const updateTime = cloudData.ultimaModificacion?.toDate();
-
-                        if (cloudData.ultimoUsuario !== currentUser &&
-                            (!lastCloudUpdate || updateTime > lastCloudUpdate)) {
-                            console.log('🔄 Cambios detectados de:', cloudData.ultimoUsuario);
-                            restoreData(cloudData.data);
-                            lastCloudUpdate = updateTime;
-                            showNotification('📲 Datos actualizados por ' + cloudData.ultimoUsuario);
-                        }
-                    }
-                }, (error) => {
-                    console.warn('⚠️ Error en listener:', error);
-                });
-        }
-
-        function saveChanges() {
-            if (!currentUser) {
-                showNotification('⚠️ Debe identificarse primero', 'error');
-                changeUser();
-                return;
-            }
-
-            if (!requireAdmin(() => saveChanges())) return;
-
-            document.getElementById('save-username').value = currentUser;
-            document.getElementById('save-comment').value = '';
-            document.getElementById('modal-save').style.display = 'block';
-        }
-
-        function confirmSave() {
-            const username = document.getElementById('save-username').value.trim();
-            const comment = document.getElementById('save-comment').value.trim();
-
-            if (!username) {
-                showNotification('⚠️ Debe ingresar su nombre', 'error');
-                return;
-            }
-
-            currentUser = username;
-            localStorage.setItem('currentUser', currentUser);
-            updateUserDisplay();
-
-            const currentData = getAllCurrentData();
-            showLoading();
-
-            db.collection("estadoActual").doc("subestacion").set({
-                data: currentData,
-                ultimoUsuario: username,
-                ultimaModificacion: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                return db.collection("historialModificaciones").add({
-                    usuario: username,
-                    comentario: comment,
-                    fecha: firebase.firestore.FieldValue.serverTimestamp(),
-                    resumen: {
-                        general: currentData.progress?.general?.value || 0,
-                        civil: currentData.progress?.['civil-dashboard']?.value || 0,
-                        electromecanica: currentData.progress?.['electromecanica-dashboard']?.value || 0,
-                        puestaMarcha: currentData.progress?.['puesta-marcha-dashboard']?.value || 0
-                    }
-                });
-            })
-            .then(() => {
-                lastSaveTime = new Date().toISOString();
-                localStorage.setItem('lastSaveTime', lastSaveTime);
-                hasUnsavedChanges = false;
-                document.getElementById('unsaved-indicator').style.display = 'none';
-                updateLastSaveDisplay();
-                closeModal('modal-save');
-                hideLoading();
-                showNotification('☁️ Guardado en la nube por: ' + username);
-            })
-            .catch((error) => {
-                console.error('❌ Error al guardar:', error);
-                hideLoading();
-                saveToLocalStorage();
-                showNotification('⚠️ Error de conexión - Guardado local', 'error');
-            });
-        }
-
-        function syncNow() {
-            showNotification('🔄 Sincronizando...');
-            loadFromCloud();
-        }
-
-        function loadLocalFallback() {
-            try {
-                const saved = localStorage.getItem('subestacion-data');
-                if (!saved) return;
-                const data = JSON.parse(saved);
-                restoreData(data);
-                console.log('📂 Datos cargados desde respaldo local');
-            } catch (e) {
-                console.warn('No hay datos locales');
-            }
-        }
-
-        function saveToLocalStorage() {
-            try {
-                const data = getAllCurrentData();
-                localStorage.setItem('subestacion-data', JSON.stringify(data));
-            } catch (e) {
-                console.warn('No se pudo guardar localmente');
-            }
-        }
-
-        function restoreData(data) {
-            if (!data) return;
-
-            if (data.progress) {
-                Object.entries(data.progress).forEach(([section, info]) => {
-                    let bar = document.querySelector(`.card[data-section="${section}"] .progress-fill`);
-                    if (!bar) bar = document.getElementById('progress-' + section);
-                    if (bar) {
-                        bar.style.width = info.value + '%';
-                        bar.textContent = info.value + '%';
-                        bar.dataset.value = info.value;
-                    }
-                });
-            }
-
-            if (data.tasks && data.tasks.length > 0) {
-                data.tasks.forEach(savedTask => {
-                    const taskElement = document.querySelector(`.task-item[data-id="${savedTask.id}"]`);
-                    if (taskElement) {
-                        const nameSpan = taskElement.querySelector('span:first-child');
-                        if (nameSpan && savedTask.name) nameSpan.textContent = savedTask.name;
-
-                        const badge = taskElement.querySelector('.status-badge');
-                        if (badge) {
-                            badge.textContent = savedTask.percentage;
-                            badge.className = 'status-badge status-' + savedTask.status;
-                        }
-
-                        taskElement.className = 'task-item ' + savedTask.status;
-                    }
-                });
-            }
-
-            updateAllProgressBars();
-            updateDashboardFromTasks();
-        }
-
-        // ═══════════════════════════════════════════
-        // OBTENER DATOS ACTUALES
-        // ═══════════════════════════════════════════
-        function getAllCurrentData() {
-            const data = { progress: {}, tasks: [] };
-
-            document.querySelectorAll('.progress-fill[data-value]').forEach(bar => {
-                const card = bar.closest('.card');
-                const section = card?.dataset?.section || bar.id || 'general';
-                data.progress[section] = {
-                    value: bar.dataset.value,
-                    text: bar.textContent
-                };
-            });
-
-            document.querySelectorAll('.task-item[data-id]').forEach(task => {
-                const badge = task.querySelector('.status-badge');
-                const nameSpan = task.querySelector('span:first-child');
-                data.tasks.push({
-                    id: task.dataset.id,
-                    name: nameSpan ? nameSpan.textContent : '',
-                    percentage: badge ? badge.textContent : '0%',
-                    status: task.className.includes('completed') ? 'completed' :
-                            task.className.includes('in-progress') ? 'in-progress' : 'pending'
-                });
-            });
-
-            return data;
-        }
-
-        // ═══════════════════════════════════════════
-        // DASHBOARD AUTOMÁTICO
-        // ═══════════════════════════════════════════
-        function updateDashboardFromTasks() {
-            const civilSections = ['movimiento-tierras', 'cimentaciones', 'estructuras', 'drenajes'];
-            const civilAvg = calculateAverageProgress(civilSections);
-            updateDashboardCard('civil-dashboard', civilAvg);
-
-            const electromecanicaSections = ['transformador', 'alta-tension', 'tableros'];
-            const electromecanicaAvg = calculateAverageProgress(electromecanicaSections);
-            updateDashboardCard('electromecanica-dashboard', electromecanicaAvg);
-
-            const puestaMarchaAvg = calculatePuestaMarchaProgress();
-            updateDashboardCard('puesta-marcha-dashboard', puestaMarchaAvg);
-
-            const generalAvg = Math.round((civilAvg + electromecanicaAvg + puestaMarchaAvg) / 3);
-            updateDashboardCard('general', generalAvg);
-        }
-
-        function calculateAverageProgress(sections) {
-            let totalPercentage = 0;
-            let count = 0;
-
-            sections.forEach(section => {
-                const card = document.querySelector(`.card[data-section="${section}"]`);
-                if (card) {
-                    const badges = card.querySelectorAll('.status-badge');
-                    if (badges.length > 0) {
-                        let sectionTotal = 0;
-                        badges.forEach(badge => {
-                            const text = badge.textContent.replace('%', '');
-                            sectionTotal += parseInt(text) || 0;
-                        });
-                        totalPercentage += Math.round(sectionTotal / badges.length);
-                        count++;
-                    }
-                }
-            });
-
-            return count > 0 ? Math.round(totalPercentage / count) : 0;
-        }
-
-        function calculatePuestaMarchaProgress() {
-            const timelineItems = document.querySelectorAll('#puesta-marcha .timeline-item');
-            if (timelineItems.length === 0) return 0;
-
-            let totalPercentage = 0;
-            timelineItems.forEach(item => {
-                const badge = item.querySelector('.status-badge');
-                if (badge) {
-                    const text = badge.textContent;
-                    if (text.includes('Completado') || text === '100%') totalPercentage += 100;
-                    else if (text.includes('En Progreso') || text === '50%') totalPercentage += 50;
-                }
-            });
-
-            return Math.round(totalPercentage / timelineItems.length);
-        }
-
-        function updateDashboardCard(section, value) {
-            const progressBar = document.getElementById('progress-' + section);
-            const statNumber = document.getElementById('stat-' + section);
-
-            if (progressBar) {
-                progressBar.style.width = value + '%';
-                progressBar.textContent = value + '%';
-                progressBar.dataset.value = value;
-            }
-            if (statNumber) statNumber.textContent = value + '%';
-        }
-
-        // ═══════════════════════════════════════════
-        // FUNCIONES DE EDICIÓN (protegidas)
-        // ═══════════════════════════════════════════
-        function editProgress(section, element) {
-            if (!requireAdmin(() => editProgress(section, element))) return;
-            currentSection = section;
-            currentProgressBar = element.querySelector('.progress-fill');
-
-            document.getElementById('modal-section-name').textContent = section.replace(/-/g, ' ').toUpperCase();
-            document.getElementById('progress-slider').value = currentProgressBar.dataset.value;
-            document.getElementById('progress-value').textContent = currentProgressBar.dataset.value + '%';
-
-            document.getElementById('modal-progress').style.display = 'block';
-        }
-
-        function saveProgress(event) {
-            event.preventDefault();
-            if (!requireAdmin(() => saveProgress(event))) return;
-            const newValue = document.getElementById('progress-slider').value;
-
-            if (currentProgressBar) {
-                currentProgressBar.style.width = newValue + '%';
-                currentProgressBar.textContent = newValue + '%';
-                currentProgressBar.dataset.value = newValue;
-                markAsChanged();
-            }
-
-            closeModal('modal-progress');
-            updateDashboardFromTasks();
-            showNotification('✅ Progreso: ' + newValue + '% (Guarde para sincronizar)');
-        }
-
-        function cycleStatus(element) {
-            if (!requireAdmin(() => cycleStatus(element))) return;
-            const statuses = ['pending', 'in-progress', 'completed'];
-            const percentages = ['0%', '50%', '100%'];
-            const currentStatus = element.classList.contains('status-completed') ? 'completed' :
-                                  element.classList.contains('status-in-progress') ? 'in-progress' : 'pending';
-
-            const currentIndex = statuses.indexOf(currentStatus);
-            const nextIndex = (currentIndex + 1) % statuses.length;
-            const nextStatus = statuses[nextIndex];
-
-            element.className = 'status-badge status-' + nextStatus;
-            element.textContent = percentages[nextIndex];
-
-            const taskItem = element.closest('.task-item');
-            if (taskItem) taskItem.className = 'task-item ' + nextStatus;
-
-            markAsChanged();
-            updateAllProgressBars();
-            showNotification('🔄 Estado: ' + percentages[nextIndex] + ' (Dashboard actualizado)');
-        }
-
-        function editTaskPercentage(button) {
-            if (!requireAdmin(() => editTaskPercentage(button))) return;
-            currentTaskElement = button.closest('.task-item');
-            const taskName = currentTaskElement.querySelector('span:first-child').textContent;
-            const percentageSpan = currentTaskElement.querySelector('.status-badge');
-            const currentPercentage = parseInt(percentageSpan.textContent);
-
-            document.getElementById('task-name').value = taskName;
-            document.getElementById('task-percentage').value = currentPercentage;
-
-            const statusClass = percentageSpan.classList.contains('status-completed') ? 'completed' :
-                               percentageSpan.classList.contains('status-in-progress') ? 'in-progress' : 'pending';
-            document.getElementById('task-status').value = statusClass;
-
-            document.getElementById('modal-task').style.display = 'block';
-        }
-
-        function editTask(button) {
-            if (!requireAdmin(() => editTask(button))) return;
-            currentTaskElement = button.closest('.task-item') || button.closest('.timeline-item');
-
-            let taskName, percentageSpan, statusClass;
-
-            if (currentTaskElement.classList.contains('timeline-item')) {
-                taskName = currentTaskElement.querySelector('h4').textContent;
-                percentageSpan = currentTaskElement.querySelector('.status-badge');
-            } else {
-                taskName = currentTaskElement.querySelector('span:first-child').textContent;
-                percentageSpan = currentTaskElement.querySelector('.status-badge');
-            }
-
-            const percentageText = percentageSpan.textContent;
-            const percentage = parseInt(percentageText) || 0;
-
-            document.getElementById('task-name').value = taskName;
-            document.getElementById('task-percentage').value = percentage;
-
-            statusClass = percentageSpan.classList.contains('status-completed') ? 'completed' :
-                         percentageSpan.classList.contains('status-in-progress') ? 'in-progress' : 'pending';
-            document.getElementById('task-status').value = statusClass;
-
-            document.getElementById('modal-task').style.display = 'block';
-        }
-
-        function saveTask(event) {
-            event.preventDefault();
-            if (!requireAdmin(() => saveTask(event))) return;
-            if (!currentTaskElement) return;
-
-            const newName = document.getElementById('task-name').value;
-            const newPercentage = document.getElementById('task-percentage').value;
-            const newStatus = document.getElementById('task-status').value;
-
-            const nameSpan = currentTaskElement.querySelector('span:first-child, h4');
-            if (nameSpan) nameSpan.textContent = newName;
-
-            const badge = currentTaskElement.querySelector('.status-badge');
-            if (badge) {
-                badge.textContent = newPercentage + '%';
-                badge.className = 'status-badge status-' + newStatus;
-            }
-
-            if (currentTaskElement.classList.contains('task-item')) {
-                currentTaskElement.className = 'task-item ' + newStatus;
-            }
-
-            markAsChanged();
-            closeModal('modal-task');
-            updateAllProgressBars();
-            showNotification('✅ Tarea actualizada (Dashboard actualizado)');
-        }
-
-        function editSectionProgress(button) {
-            if (!requireAdmin(() => editSectionProgress(button))) return;
-            const card = button.closest('.card');
-            const progressBar = card.querySelector('.progress-fill');
-            const sectionName = card.dataset.section;
-            if (progressBar && sectionName) editProgress(sectionName, card.querySelector('.progress-bar'));
-        }
-
-        function updateAllProgressBars() {
-            document.querySelectorAll('.card[data-section]').forEach(card => {
-                const badges = card.querySelectorAll('.status-badge');
-                if (badges.length === 0) return;
-
-                let totalPercentage = 0;
-                badges.forEach(badge => {
-                    totalPercentage += parseInt(badge.textContent.replace('%', '')) || 0;
-                });
-
-                const average = Math.round(totalPercentage / badges.length);
-                const progressBar = card.querySelector('.progress-fill');
-                if (progressBar) {
-                    progressBar.style.width = average + '%';
-                    progressBar.textContent = average + '%';
-                    progressBar.dataset.value = average;
-                }
-            });
-
-            updateDashboardFromTasks();
-        }
-
-        // ═══════════════════════════════════════════
-        // AGREGAR ACTIVIDADES (protegido)
-        // ═══════════════════════════════════════════
-        function addNewActivity(type) {
-            if (!requireAdmin(() => addNewActivity(type))) return;
-            const modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'block';
-            modal.id = 'modal-new-activity';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-                    <h2>Agregar Nueva Actividad - ${type === 'civil' ? 'Obra Civil' : type === 'electromecanica' ? 'Electromecánica' : 'Puesta en Marcha'}</h2>
-                    <form onsubmit="addActivity(event, '${type}')">
-                        <div class="form-group">
-                            <label>Nombre de la Actividad</label>
-                            <input type="text" id="new-activity-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Sección</label>
-                            <select id="new-activity-section">
-                                ${getSectionsForType(type)}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Porcentaje Inicial (%)</label>
-                            <input type="number" id="new-activity-percentage" min="0" max="100" value="0" required>
-                        </div>
-                        <button type="submit" class="btn btn-success" style="width: 100%;">✅ Agregar Actividad</button>
-                    </form>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function getSectionsForType(type) {
-            if (type === 'civil') {
-                return `
-                    <option value="movimiento-tierras">Movimiento de Tierras</option>
-                    <option value="cimentaciones">Cimentaciones</option>
-                    <option value="estructuras">Estructuras</option>
-                    <option value="drenajes">Drenajes</option>
-                `;
-            } else if (type === 'electromecanica') {
-                return `
-                    <option value="transformador">Transformador</option>
-                    <option value="alta-tension">Alta Tensión</option>
-                    <option value="tableros">Tableros</option>
-                `;
-            }
-            return '<option value="general">General</option>';
-        }
-
-        function addActivity(event, type) {
-            event.preventDefault();
-            if (!requireAdmin(() => addActivity(event, type))) return;
-
-            const name = document.getElementById('new-activity-name').value;
-            const section = document.getElementById('new-activity-section').value;
-            const percentage = parseInt(document.getElementById('new-activity-percentage').value);
-
-            const card = document.querySelector(`.card[data-section="${section}"]`);
-            if (card) {
-                const taskList = card.querySelector('.task-list');
-                const newTask = document.createElement('li');
-                const status = percentage >= 100 ? 'completed' : percentage > 0 ? 'in-progress' : 'pending';
-                newTask.className = 'task-item ' + status;
-                newTask.dataset.id = 'new_' + Date.now();
-                newTask.innerHTML = `
-                    <span>${name}</span>
-                    <span class="status-badge status-${status}" onclick="cycleStatus(this); markAsChanged()">${percentage}%</span>
-                    <button class="btn btn-edit" onclick="editTaskPercentage(this)">%</button>
-                `;
-                taskList.appendChild(newTask);
-
-                markAsChanged();
-                updateAllProgressBars();
-                showNotification('✅ Actividad agregada: ' + name);
-            }
-
-            document.getElementById('modal-new-activity').remove();
-        }
-
-        // ═══════════════════════════════════════════
-        // USUARIO E HISTORIAL
-        // ═══════════════════════════════════════════
-        function changeUser() {
-            document.getElementById('change-username').value = currentUser;
-            document.getElementById('modal-user').style.display = 'block';
-        }
-
-        function changeUserConfirm() {
-            const newUser = document.getElementById('change-username').value.trim();
-            if (!newUser) {
-                showNotification('⚠️ Debe ingresar un nombre', 'error');
-                return;
-            }
-            currentUser = newUser;
-            localStorage.setItem('currentUser', currentUser);
-            updateUserDisplay();
-            closeModal('modal-user');
-            showNotification('👤 Usuario: ' + currentUser);
-        }
-
         function showHistory() {
-            const historyList = document.getElementById('history-list');
-            historyList.innerHTML = '<p style="color: #6c757d;">Cargando historial...</p>';
-            document.getElementById('modal-history').style.display = 'block';
-
-            db.collection("historialModificaciones")
-                .orderBy("fecha", "desc")
-                .limit(50)
-                .get()
-                .then((snapshot) => {
-                    if (snapshot.empty) {
-                        historyList.innerHTML = '<p style="color: #6c757d;">No hay modificaciones registradas</p>';
-                    } else {
-                        modificationHistory = [];
-                        historyList.innerHTML = '';
-                        snapshot.forEach((doc) => {
-                            const entry = doc.data();
-                            modificationHistory.push(entry);
-                            const date = entry.fecha ? entry.fecha.toDate() : new Date();
-                            historyList.innerHTML += `
-                                <div class="history-item">
-                                    <div>
-                                        <span class="history-user">👤 ${entry.usuario}</span>
-                                        <span class="history-time">📅 ${date.toLocaleString()}</span>
-                                    </div>
-                                    ${entry.comentario ? `<div style="margin-top: 5px;">📝 ${entry.comentario}</div>` : ''}
-                                    ${entry.resumen ? `
-                                        <div style="margin-top: 5px; font-size: 0.8em; color: #6c757d;">
-                                            📊 Gral: ${entry.resumen.general || 0}% |
-                                            🏗️ Civil: ${entry.resumen.civil || 0}% |
-                                            ⚙️ Elec: ${entry.resumen.electromecanica || 0}% |
-                                            🔌 PM: ${entry.resumen.puestaMarcha || 0}%
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        });
-                    }
-                })
-                .catch((error) => {
-                    historyList.innerHTML = '<p style="color: #EF5350;">Error al cargar historial</p>';
-                });
-        }
-
-        function clearHistory() {
-            if (confirm('¿Está seguro de limpiar todo el historial de la nube?')) {
-                db.collection("historialModificaciones").get()
-                    .then((snapshot) => {
-                        const batch = db.batch();
-                        snapshot.forEach((doc) => batch.delete(doc.ref));
-                        return batch.commit();
-                    })
-                    .then(() => {
-                        showNotification('🗑️ Historial limpiado');
-                        closeModal('modal-history');
-                    })
-                    .catch(() => showNotification('Error al limpiar', 'error'));
-            }
+            alert('Historial de modificaciones:\n\n' +
+                  (lastSaveTime ? 'Último guardado: ' + new Date(lastSaveTime).toLocaleString() : 'Sin registros'));
         }
 
         function closeModal(modalId) {
@@ -1995,18 +1837,6 @@
                 event.target.style.display = 'none';
             }
         }
-
-        // Auto-guardado local periódico
-        setInterval(() => {
-            if (hasUnsavedChanges) {
-                saveToLocalStorage();
-                console.log('⏰ Respaldo local automático');
-            }
-        }, 30000);
-
-        window.addEventListener('beforeunload', () => {
-            saveToLocalStorage();
-        });
     </script>
 </body>
 </html>
